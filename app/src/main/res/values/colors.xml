@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="phase">#ff5533</color>
+    <color name="freq">#007020</color>
+    <color name="freq2">#00aa50</color>
+    <color name="freqalt">#009980</color>
+    <color name="vol">#aaaa33</color>
+    <color name="form">#333333</color>
+</resources>

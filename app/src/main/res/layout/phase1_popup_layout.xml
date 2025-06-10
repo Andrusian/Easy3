@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#444444">
+
+    <LinearLayout
+        android:id="@+id/popup_container"
+        android:layout_width="349dp"
+        android:layout_height="371dp"
+        android:layout_gravity="center"
+        android:background="@drawable/popup_background"
+        android:backgroundTint="#805F0D0D"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <com.andrus.easy3.AudioDialer
+                android:id="@+id/phaseDial2"
+                android:layout_width="400dp"
+                android:layout_height="400dp" />
+
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#6C757D"
+            android:text="Hide"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+</FrameLayout>

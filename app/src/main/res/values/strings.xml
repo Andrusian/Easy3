@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Easy3</string>
+    <string name="extra_description">"The Extra oscillators feature lets you drive parameters of other oscillators and modules automatically. Only useful features are supported and not every signal will be shown on the interface. "</string>
+
+    <string-array name="destinations">
+        <item>-- Not Set --</item>
+        <item>Car Ph</item>
+        <item>Vol L</item>
+        <item>Vol R</item>
+
+        <item>L1 Ph</item>
+        <item>L1 Freq</item>
+        <item>L1 Dep</item>
+        <item>L1 Duty</item>
+
+        <item>R1 Freq</item>
+        <item>R1 Dep</item>
+        <item>R1 Duty</item>
+
+        <item>L2 Freq</item>
+
+        <item>R2 Freq</item>
+        <item>R2 Duty</item>
+    </string-array>
+</resources>
