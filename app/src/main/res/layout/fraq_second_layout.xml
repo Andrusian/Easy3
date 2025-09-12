@@ -11,7 +11,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Modulators"
+        android:text="Amods"
         android:textColor="@color/white"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="330dp"
-        app:layout_constraintGuide_percent=".5" />
+        app:layout_constraintGuide_percent=".49" />
 
 
     <ImageView
@@ -72,16 +72,16 @@
     <Button
         android:id="@+id/amod_phase_button"
         android:layout_width="80dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="5dp"
+        android:layout_height="38dp"
+        android:layout_marginEnd="10dp"
         android:backgroundTint="@color/phase"
         android:paddingLeft="0dp"
         android:paddingTop="0dp"
         android:paddingRight="0dp"
         android:paddingBottom="0dp"
         android:text="Phase"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/L1form" />
+        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintEnd_toStartOf="@+id/guideline" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline5"
@@ -131,12 +131,14 @@
 
     <Spinner
         android:id="@+id/L1form"
-        android:layout_width="60dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline5" />
+        app:layout_constraintTop_toBottomOf="@+id/dutyL1" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/dutyL1"
         android:layout_width="0dp"
         android:layout_height="30dp"
@@ -146,14 +148,14 @@
         android:max="80"
         android:min="20"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toEndOf="@+id/L1form"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/padL1" />
 
     <Button
         android:id="@+id/muteButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:backgroundTint="@color/vol"
+        android:backgroundTint="#666666"
         android:paddingLeft="0dp"
         android:paddingTop="0dp"
         android:paddingRight="0dp"
@@ -182,28 +184,32 @@
 
     <Spinner
         android:id="@+id/L2form"
-        android:layout_width="60dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/padL2" />
+        app:layout_constraintTop_toBottomOf="@+id/dutyL2" />
 
     <Spinner
         android:id="@+id/R1form"
-        android:layout_width="60dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/padR1" />
+        app:layout_constraintTop_toBottomOf="@+id/dutyR1" />
 
     <Spinner
         android:id="@+id/R2form"
-        android:layout_width="60dp"
+        android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/padR2" />
+        app:layout_constraintTop_toBottomOf="@+id/dutyR2" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/dutyL2"
         android:layout_width="0dp"
         android:layout_height="30dp"
@@ -213,32 +219,50 @@
         android:max="80"
         android:min="20"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toEndOf="@+id/L2form"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/padL2" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/dutyR1"
         android:layout_width="0dp"
         android:layout_height="30dp"
+        android:layout_marginStart="10dp"
         android:background="@color/form"
         android:backgroundTint="@color/form"
         android:max="80"
         android:min="20"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/R1form"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/padR1" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/dutyR2"
         android:layout_width="0dp"
         android:layout_height="30dp"
+        android:layout_marginStart="10dp"
         android:background="@color/form"
         android:backgroundTint="@color/form"
         android:max="80"
         android:min="20"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/R2form"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/padR2" />
+
+    <Button
+        android:id="@+id/Log"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="40dp"
+        android:backgroundTint="#ff0000"
+        android:paddingLeft="0dp"
+        android:paddingTop="0dp"
+        android:paddingRight="0dp"
+        android:paddingBottom="0dp"
+        android:text="Log"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

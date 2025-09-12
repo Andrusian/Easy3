@@ -100,33 +100,39 @@ public class Presets {
             writeSection("extras");
 
             saveItem("oscAfreq",synth.oscA.freq);
-            saveItem("oscAform",synth.oscA.form);
+            saveInt2("oscAform",synth.oscA.form);
             saveItem("oscAduty",synth.oscA.duty);
             saveItem("oscAphase",synth.oscA.getPhase());
-            saveItem("oscAdestination",synth.oscA.destination);
+            saveInt2("oscAdestination",synth.oscA.destination);
             saveBoolean("oscAenabled",destinationFlags[synth.oscA.destination]);
             saveItem("oscAmax",synth.oscA.maxValue);
             saveItem("oscAmin",synth.oscA.minValue);
 
             saveItem("oscBfreq",synth.oscB.freq);
-            saveItem("oscBform",synth.oscB.form);
+            saveInt2("oscBform",synth.oscB.form);
             saveItem("oscBduty",synth.oscB.duty);
             saveItem("oscBphase",synth.oscB.getPhase());
-            saveItem("oscBdestination",synth.oscB.destination);
+            saveInt2("oscBdestination",synth.oscB.destination);
             saveBoolean("oscBenabled",destinationFlags[synth.oscB.destination]);
             saveItem("oscBmax",synth.oscB.maxValue);
             saveItem("oscBmin",synth.oscB.minValue);
 
             saveItem("oscCfreq",synth.oscC.freq);
-            saveItem("oscCform",synth.oscC.form);
+            saveInt2("oscCform",synth.oscC.form);
             saveItem("oscCduty",synth.oscC.duty);
             saveItem("oscCphase",synth.oscC.getPhase());
-            saveItem("oscCdestination",synth.oscC.destination);
+            saveInt2("oscCdestination",synth.oscC.destination);
             saveBoolean("oscCenabled",destinationFlags[synth.oscC.destination]);
             saveItem("oscCmax",synth.oscC.maxValue);
             saveItem("oscCmin",synth.oscC.minValue);
 
-            // extra oscillator settings
+            // silences boosts
+
+            saveInt2("silenceMode",synth.silenceMode);
+            saveInt2("boostMode",synth.boostMode);
+            saveItem("silenceDelay",synth.silenceDelay);
+            saveItem("silenceLength",synth.silenceLength);
+            saveInt2("silenceEvents",synth.silenceEvents);
 
             out.close();
             out=null;
@@ -162,6 +168,13 @@ public class Presets {
         out.write(" = ");
         String colorst= String.format("#%06X", (0xFFFFFF & color));
         out.write(String.valueOf(colorst));
+        out.write("\n");
+    }
+
+    private void saveInt2(String tag, int value) {
+        out.write(tag);
+        out.write(" = ");
+        out.write(String.valueOf(value));
         out.write("\n");
     }
 
@@ -248,6 +261,9 @@ public class Presets {
 
             String input;
 
+            synth.silenceMode=0;   // clear for backwards compatibility
+            synth.boostMode=0;
+
             while ((input = in.readLine()) != null) {
                 String[] items=input.split("\\s=\\s");
                 if (items.length==2) {           // did the regex match?
@@ -270,41 +286,41 @@ public class Presets {
                         double settingNum = Double.parseDouble(items[1]);
 
                         synth.oscL1.setFreq(settingNum);
-                        Log.i("PRESET","leftFreq "+settingNum+" position "+freqScaleY((float)settingNum));
+                        //Log.i("PRESET","leftFreq "+settingNum+" position "+freqScaleY((float)settingNum));
                     }
                     else if (tag.equals("leftFreq2")) {
                         double settingNum = Double.parseDouble(items[1]);
 
                         synth.oscL2.setFreq(settingNum);
-                        Log.i("PRESET","leftFreq2 "+settingNum+" position "+freqScaleY((float)settingNum));
+                        //Log.i("PRESET","leftFreq2 "+settingNum+" position "+freqScaleY((float)settingNum));
                     }
                     else if (tag.equals("rightFreq")) {
                         double settingNum = Double.parseDouble(items[1]);
 
                         synth.oscR1.setFreq(settingNum);
-                        Log.i("PRESET","rightFreq "+settingNum+" position "+freqScaleY((float)settingNum));
+                        //Log.i("PRESET","rightFreq "+settingNum+" position "+freqScaleY((float)settingNum));
                     }
                     else if (tag.equals("rightFreq2")) {
                         double settingNum = Double.parseDouble(items[1]);
 
                         synth.oscR2.setFreq(settingNum);
-                        Log.i("PRESET","rightFreq2 "+settingNum+" position "+freqScaleY((float)settingNum));
+                        //Log.i("PRESET","rightFreq2 "+settingNum+" position "+freqScaleY((float)settingNum));
                     }
                     else if (tag.equals("waveformL1")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinnerL1.setSelection((int)settingNum);
+//                        waveformSpinnerL1.setSelection((int)settingNum);
                     }
                     else if (tag.equals("waveformL2")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinnerL2.setSelection((int)settingNum);
+//                        waveformSpinnerL2.setSelection((int)settingNum);
                     }
                     else if (tag.equals("waveformR1")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinnerR1.setSelection((int)settingNum);
+//                        waveformSpinnerR1.setSelection((int)settingNum);
                     }
                     else if (tag.equals("waveformR2")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinnerR2.setSelection((int)settingNum);
+//                        waveformSpinnerR2.setSelection((int)settingNum);
                     }
 
                     // AMODS...
@@ -367,78 +383,197 @@ public class Presets {
 
                     else if (tag.equals("amodL1form")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinner1.setSelection((int)settingNum);
+
+//                       waveformSpinner1.setSelection((int)settingNum);
                     }
                     else if (tag.equals("amodL2form")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinner2.setSelection((int)settingNum);
+//                        waveformSpinner2.setSelection((int)settingNum);
                     }
                     else if (tag.equals("amodR1form")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinner3.setSelection((int)settingNum);
+//                        waveformSpinner3.setSelection((int)settingNum);
                     }
                     else if (tag.equals("amodR2form")) {
                         double settingNum = Double.parseDouble(items[1]);
-                        waveformSpinner4.setSelection((int)settingNum);
+//                        waveformSpinner4.setSelection((int)settingNum);
                     }
 
                     else if (tag.equals("outL")) {
                         double settingNum = Double.parseDouble(items[1]);
                         synth.outMod.setVolL(settingNum);
-                        Log.i("LOAD","Left volume set to "+settingNum);
+                        //Log.i("LOAD","Left volume set to "+settingNum);
                     }
                     else if (tag.equals("outR")) {
                         double settingNum = Double.parseDouble(items[1]);
                         synth.outMod.setVolR(settingNum);
-                        Log.i("LOAD","Right volume set to "+settingNum);
+                        //Log.i("LOAD","Right volume set to "+settingNum);
                     }
+
+
+
                     else if (tag.equals("oscAfreq")) {
                         double settingNum = Double.parseDouble(items[1]);
                         synth.oscA.setFreq(settingNum);
-                        Log.i("LOAD","oscA freq set to "+settingNum);
+                        //Log.i("LOAD","oscA freq set to "+settingNum);
                     }
                     else if (tag.equals("oscAform")) {
+                        Log.i("EASY3", "oscAform"+items[1]);
                         int settingInt = Integer.parseInt((items[1]));
                         synth.oscA.setForm(settingInt);
-                        Log.i("LOAD","oscA form set to "+settingInt);
+                        //Log.i("LOAD","oscA form set to "+settingInt);
                     }
                     else if (tag.equals("oscAduty")) {
                         double settingNum = Double.parseDouble((items[1]));
                         synth.oscA.setDuty(settingNum);
-                        Log.i("LOAD","oscA duty set to "+settingNum);
+                        //Log.i("LOAD","oscA duty set to "+settingNum);
                     }
                     else if (tag.equals("oscAphase")) {
                         double settingNum = Double.parseDouble((items[1]));
                         synth.oscA.setDuty(settingNum);
-                        Log.i("LOAD","oscA phase set to "+settingNum);
+                        //Log.i("LOAD","oscA phase set to "+settingNum);
                     }
                     else if (tag.equals("oscAdestination")) {
                         int settingInt = Integer.parseInt((items[1]));
                         synth.oscA.destination=settingInt;
-                        Log.i("LOAD","oscA dest set to "+settingInt);
+                        //Log.i("LOAD","oscA dest set to "+settingInt);
                     }
                     else if (tag.equals("oscAenabled")) {
                         boolean settingBool = Boolean.parseBoolean((items[1]));
                         destinationFlags[synth.oscA.destination]=settingBool;
                         synth.oscA.setActive(settingBool);
-                        Log.i("LOAD","oscA destFlag and active set to "+settingBool);
+                        //Log.i("LOAD","oscA destFlag and active set to "+settingBool);
                     }
                     else if (tag.equals("oscAmax")) {
                         double settingNum = Double.parseDouble((items[1]));
                         synth.oscA.setMax(settingNum);
-                        Log.i("LOAD","oscA max set to "+settingNum);
+                        //Log.i("LOAD","oscA max set to "+settingNum);
                     }
                     else if (tag.equals("oscAmin")) {
                         double settingNum = Double.parseDouble((items[1]));
                         synth.oscA.setMin(settingNum);
-                        Log.i("LOAD","oscA min set to "+settingNum);
+                        //Log.i("LOAD","oscA min set to "+settingNum);
                     }
+
+
+                    else if (tag.equals("oscCfreq")) {
+                        double settingNum = Double.parseDouble(items[1]);
+                        synth.oscC.setFreq(settingNum);
+                        //Log.i("LOAD","oscC freq set to "+settingNum);
+                    }
+                    else if (tag.equals("oscCform")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.oscC.setForm(settingInt);
+                        //Log.i("LOAD","oscC form set to "+settingInt);
+                    }
+                    else if (tag.equals("oscCduty")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscC.setDuty(settingNum);
+                        //Log.i("LOAD","oscC duty set to "+settingNum);
+                    }
+                    else if (tag.equals("oscCphase")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscC.setDuty(settingNum);
+                        //Log.i("LOAD","oscC phase set to "+settingNum);
+                    }
+                    else if (tag.equals("oscCdestination")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.oscC.destination=settingInt;
+                        //Log.i("LOAD","oscC dest set to "+settingInt);
+                    }
+                    else if (tag.equals("oscCenabled")) {
+                        boolean settingBool = Boolean.parseBoolean((items[1]));
+                        destinationFlags[synth.oscC.destination]=settingBool;
+                        synth.oscC.setActive(settingBool);
+                        //Log.i("LOAD","oscC destFlag and active set to "+settingBool);
+                    }
+                    else if (tag.equals("oscCmax")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscC.setMax(settingNum);
+                        //Log.i("LOAD","oscC max set to "+settingNum);
+                    }
+                    else if (tag.equals("oscCmin")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscC.setMin(settingNum);
+                        //Log.i("LOAD","oscC min set to "+settingNum);
+                    }
+
+
+
+                    else if (tag.equals("oscBfreq")) {
+                        double settingNum = Double.parseDouble(items[1]);
+                        synth.oscA.setFreq(settingNum);
+                        //Log.i("LOAD","oscB freq set to "+settingNum);
+                    }
+                    else if (tag.equals("oscBform")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.oscA.setForm(settingInt);
+                        //Log.i("LOAD","oscB form set to "+settingInt);
+                    }
+                    else if (tag.equals("oscBduty")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscA.setDuty(settingNum);
+                        //Log.i("LOAD","oscB duty set to "+settingNum);
+                    }
+                    else if (tag.equals("oscBphase")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscA.setDuty(settingNum);
+                        //Log.i("LOAD","oscB phase set to "+settingNum);
+                    }
+                    else if (tag.equals("oscBdestination")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.oscA.destination=settingInt;
+                        //Log.i("LOAD","oscB dest set to "+settingInt);
+                    }
+                    else if (tag.equals("oscBenabled")) {
+                        boolean settingBool = Boolean.parseBoolean((items[1]));
+                        destinationFlags[synth.oscB.destination]=settingBool;
+                        synth.oscA.setActive(settingBool);
+                        //Log.i("LOAD","oscB destFlag and active set to "+settingBool);
+                    }
+                    else if (tag.equals("oscBmax")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscA.setMax(settingNum);
+                        //Log.i("LOAD","oscB max set to "+settingNum);
+                    }
+                    else if (tag.equals("oscBmin")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.oscB.setMin(settingNum);
+                        //Log.i("LOAD","oscB min set to "+settingNum);
+                    }
+
+                    // silences and boosts
+
+                    else if (tag.equals("silenceMode")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.silenceMode=settingInt;
+                    }
+                    else if (tag.equals("boostMode")) {
+                        int settingInt = Integer.parseInt((items[1]));
+                        synth.boostMode=settingInt;
+                    }
+                    else if (tag.equals("silenceDelay")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.silenceDelay=settingNum;
+                    }
+                    else if (tag.equals("silenceLength")) {
+                        double settingNum = Double.parseDouble((items[1]));
+                        synth.silenceLength=settingNum;
+                    }
+                    else if (tag.equals("silenceEvents")) {
+                        double settingInt = Integer.parseInt((items[1]));
+                        synth.silenceLength=settingInt;
+
+                    }
+
+
 
                 }
 
                 // need to set amod touch pad positions from the current
                 // settings. It doesn't have to be exact. This is a pain in the ass
                 // but the scaling isn't internal to the touchpads.
+                // GENERALLY ASSUME THIS STUFF BELOW IS BROKEN
 
                 float padDepth;
                 float padFreq;

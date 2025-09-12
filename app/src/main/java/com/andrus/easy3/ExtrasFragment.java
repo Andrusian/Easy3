@@ -3,6 +3,10 @@ package com.andrus.easy3;
 
 import static android.content.ContentValues.TAG;
 
+import static com.andrus.easy3.C.SILENCE_LEFT;
+import static com.andrus.easy3.C.SILENCE_OFF;
+import static com.andrus.easy3.C.SILENCE_ON;
+import static com.andrus.easy3.C.SILENCE_RIGHT;
 import static com.andrus.easy3.C.destinationFlags;
 import static com.andrus.easy3.C.synth;
 import static com.andrus.easy3.Oscillator.SAW;
@@ -10,8 +14,11 @@ import static com.andrus.easy3.Oscillator.SINE;
 import static com.andrus.easy3.Oscillator.SQUARE;
 import static com.andrus.easy3.Oscillator.TRI;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +30,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +50,8 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
     Button oscAbutton;
     Button oscBbutton;
     Button oscCbutton;
+    Button silOff;
+    Button booOff;
     TextView settingsA;
     TextView settingsB;
     TextView settingsC;
@@ -51,14 +61,22 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
     CheckBox activeA;
     CheckBox activeB;
     CheckBox activeC;
+
+    SeekBar silTime1;
+    SeekBar silTime2;
+    SeekBar silEvents;
+
+
+    Runnable updater;
     int purpose;
 
     private double highLimit;
     private double lowLimit;
     private double highfreq;
     private double lowfreq;
-    private String comment=new String("Unknown");
+    private String comment = new String("Unknown");
     OscSettingsDialog dialog;
+    private Handler handler;
 
     // ADDED: Factory method to create a new instance with position
     public static com.andrus.easy3.ExtrasFragment newInstance(int position) {
@@ -95,18 +113,23 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
         Guideline guideline = view.findViewById(R.id.guideline14);
         View titleView = view.findViewById(R.id.title4);
         View previousView = titleView;
-        settingsA=view.findViewById(R.id.settingsA);
-        settingsB=view.findViewById(R.id.settingsB);
-        settingsC=view.findViewById(R.id.settingsC);
-        spinnerA=view.findViewById(R.id.spinnerA);
-        spinnerB=view.findViewById(R.id.spinnerB);
-        spinnerC=view.findViewById(R.id.spinnerC);
-        activeA=view.findViewById(R.id.activeA);
-        activeB=view.findViewById(R.id.activeB);
-        activeC=view.findViewById(R.id.activeC);
+        settingsA = view.findViewById(R.id.settingsA);
+        settingsB = view.findViewById(R.id.settingsB);
+        settingsC = view.findViewById(R.id.settingsC);
+        spinnerA = view.findViewById(R.id.spinnerA);
+        spinnerB = view.findViewById(R.id.spinnerB);
+        spinnerC = view.findViewById(R.id.spinnerC);
+        activeA = view.findViewById(R.id.activeA);
+        activeB = view.findViewById(R.id.activeB);
+        activeC = view.findViewById(R.id.activeC);
+        silOff = view.findViewById(R.id.rndOff);
+        booOff = view.findViewById(R.id.booOff);
+        silTime1 = view.findViewById(R.id.silTime1);
+        silTime2 = view.findViewById(R.id.silTime2);
+        silEvents = view.findViewById(R.id.silEvents);
 
-        // Get the scroller ImageView                   ADDED
-        scroller = view.findViewById(R.id.scroller5);   // ADDED
+        // Get the scroller ImageView
+        scroller = view.findViewById(R.id.scroller5);
 
         if (scroller == null) {
             Log.e(TAG, "scroller5 ImageView not found in layout!");
@@ -138,7 +161,7 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
             });
         }
 
-        String [] spinnerItems = getResources().getStringArray(R.array.destinations);
+        String[] spinnerItems = getResources().getStringArray(R.array.destinations);
 
         ArrayAdapter<String> adapter;
         adapter = new ArrayAdapter<>(
@@ -177,29 +200,208 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
             }
         });
 
-        activeA.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        activeA.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
-                handleCheckedChange(spinnerA,isChecked);
+                handleCheckedChange(spinnerA, isChecked);
                 synth.oscA.setActive(isChecked);
 
             }
         });
-        activeB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        activeB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
-                handleCheckedChange(spinnerB,isChecked);
+                handleCheckedChange(spinnerB, isChecked);
                 synth.oscB.setActive(isChecked);
             }
         });
-        activeC.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+        activeC.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton arg0, boolean isChecked) {
-                handleCheckedChange(spinnerC,isChecked);
+                handleCheckedChange(spinnerC, isChecked);
                 synth.oscC.setActive(isChecked);
             }
         });
 
+        silOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // implement the modes on the silence button
+
+                if (synth.silenceMode==SILENCE_OFF) {
+                    synth.silenceMode=SILENCE_ON;
+                    booOff.setEnabled(false);
+                 }
+                else if (synth.silenceMode==SILENCE_ON) {
+                    synth.silenceMode = SILENCE_LEFT;
+                }
+                else if (synth.silenceMode==SILENCE_LEFT) {
+                    synth.silenceMode = SILENCE_RIGHT;
+                }
+                else /* if (synth.silenceMode==SILENCE_RIGHT) */ {
+                    synth.silenceMode = SILENCE_OFF;
+                    booOff.setEnabled(true);
+                }
+                silOff.invalidate();
+                Log.i("extras","Silence button "+synth.silenceMode);
+            }
+        });
+
+        booOff.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // implement the modes on the silence button
+
+                if (synth.boostMode==SILENCE_OFF) {
+                    synth.boostMode=SILENCE_ON;
+                    silOff.setEnabled(false);
+                }
+                else if (synth.boostMode==SILENCE_ON) {
+                    synth.boostMode = SILENCE_LEFT;
+                }
+                else if (synth.boostMode==SILENCE_LEFT) {
+                    synth.boostMode = SILENCE_RIGHT;
+                }
+                else /* if (synth.silenceMode==SILENCE_RIGHT) */ {
+                    synth.boostMode = SILENCE_OFF;
+                    silOff.setEnabled(true);
+                }
+                booOff.invalidate();
+                Log.i("extras","Boost button "+synth.boostMode);
+            }
+        });
+
+        // need a handler to update the text and color because it could be controlled
+        // from a preset
+        handler=new Handler(Looper.getMainLooper());
+        updater = new Runnable() {
+            @Override
+            public void run() {
+                if (synth.silenceMode==SILENCE_OFF) {
+                    silOff.setText("Silence OFF");
+                    silOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#999999")));
+                }
+                else if (synth.silenceMode==SILENCE_ON) {
+                    silOff.setText("Sil Both");
+                    silOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#66cccc")));
+                }
+                else if (synth.silenceMode==SILENCE_LEFT) {
+                    silOff.setText("Sil Left");
+                    silOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#66cc66")));
+                }
+                else /*  if (synth.silenceMode==SILENCE_RIGHT) */ {
+                    silOff.setText("Sil Right");
+                    silOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#9999cc")));
+                }
+                silOff.invalidate();
+
+                if (synth.boostMode==SILENCE_OFF) {
+                    booOff.setText("Boost OFF");
+                    booOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#999999")));
+                }
+                else if (synth.boostMode==SILENCE_ON) {
+                    booOff.setText("Bst Both");
+                    booOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#66cccc")));
+                }
+                else if (synth.boostMode==SILENCE_LEFT) {
+                    booOff.setText("Bst Left");
+                    booOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#66cc66")));
+                }
+                else /*  if (synth.boostMode==SILENCE_RIGHT) */ {
+                    booOff.setText("Bst Right");
+                    booOff.setBackgroundTintList (ColorStateList.valueOf(Color.parseColor("#9999cc")));
+                }
+                silOff.invalidate();
+
+
+                Log.i("extras","silence: "+synth.silenceTrigger+" "+synth.silenceMode+" triggered:"
+                        +synth.silenceTriggered+" status:"+synth.silenceStatus+" cd:"+synth.countdown+" dosil:"+synth.dosilence+" ev:"+synth.silenceEventCount+"/"+synth.silenceEvents);
+                // Schedule next update
+                handler.postDelayed(this, 500);
+            }
+        };
+
+        updater.run();
+
+        // look after changes to delay seekbars: EVENTS
+
+        silEvents.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                synth.silenceEvents=i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        // handle initial state
+        synth.silenceEvents=1;
+
+        // look after changes to delay seekbars: delay time
+
+        // TODO: allow presets to somehow update the visual controls.
+
+        silTime1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                // delay time is scaled in seconds in the widget
+                // currently 5s to 60s
+                // can use it directly
+
+                synth.silenceDelay = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        // handle initial state
+        synth.silenceDelay=20;
+
+        silTime2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                // delay time is scaled as a percent in seekbar
+                // 5-25% is the range currently
+                // once again, we'll use this directly but convert to decimal
+
+                synth.silenceLength = i / 100.;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        //handle initial state
+        synth.silenceLength=.2;
+
+    }
+
+    // to set interface from preset restore... might or might not work
+
+    public void setSeekbars (double delay, double length, int events) {
+        silTime1.setProgress((int) Math.floor(delay));
+        silTime2.setProgress((int) Math.floor(length));
+        silEvents.setProgress((int) Math.floor(events));
     }
 
 
@@ -284,21 +486,21 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
             dialog.setNumber(oscNumber);
             purpose=spinnerA.getSelectedItemPosition();
             getLimits(purpose);
-            dialog.setupDialogValues(synth.oscA);
+            //dialog.setupDialogValues(synth.oscA);
         }
         else if (oscNumber==2) {
             dialog = new OscSettingsDialog(getActivity(), "Oscillator B");
             dialog.setNumber(oscNumber);
             purpose=spinnerB.getSelectedItemPosition();
             getLimits(purpose);
-            dialog.setupDialogValues(synth.oscB);
+            //dialog.setupDialogValues(synth.oscB);
         }
         else if (oscNumber==3) {
             dialog = new OscSettingsDialog(getActivity(), "Oscillator C");
             dialog.setNumber(oscNumber);
             purpose=spinnerC.getSelectedItemPosition();
             getLimits(purpose);
-            dialog.setupDialogValues(synth.oscC);
+            //dialog.setupDialogValues(synth.oscC);
         }
         else {
 

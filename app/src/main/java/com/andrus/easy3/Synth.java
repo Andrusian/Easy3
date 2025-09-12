@@ -8,17 +8,36 @@ import android.media.AudioFormat;
 import android.media.AudioTrack;
 import android.util.Log;
 
+import java.util.Random;
+
 public class Synth {
+
+    public Debug mydebug;
 
     private static final int SAMPLE_RATE = 48000;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_OUT_STEREO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_FLOAT;
     private static final int PATCH_BOARD_SIZE = 200;
-    private static final double DEFAULTVOL = 0.7;
+    private static final double DEFAULTVOL = 0.85;
 
     private AudioTrack audioTrack;
     private boolean isPlaying = false;
     private Thread audioThread;
+
+    // random silence function
+
+    public int silenceMode=SILENCE_OFF;
+    public int boostMode=SILENCE_OFF;   // boost and silence use same stuff
+
+    public double silenceDelay=20;
+    public double silenceLength=3;
+    public int silenceEvents=1;
+    public double silenceTrigger=0;
+    public double silenceTimer=0;
+    public double silenceEventCount=0;
+    public boolean silenceTriggered;
+    public boolean silenceStatus;
+    private double silenceDuration=1;
 
     // Oscillators
 
@@ -41,10 +60,24 @@ public class Synth {
     Oscillator oscB;   // spare oscillator
     Oscillator oscC;   // spare oscillator
 
+    double ex1;        // extra osc outputs - merely for debugging
+    double ex2;
+    double ex3;
+
     OutputModule outMod;
     Context context;
+    Random rnd=new Random();
+    private double silenceDuration2;
+    public double countdown;
+    public boolean dosilence;
+
 
     public Synth(Context c) {
+
+        // enable the debug class to capture samples
+        mydebug=new Debug();
+        mydebug.init(c,1.0,1000);
+
         context=c;
         int minBufferSize = AudioTrack.getMinBufferSize(
                 SAMPLE_RATE,
@@ -76,7 +109,7 @@ public class Synth {
         // set up default constant positions on the patchboard
 
 
-        // SIGNAL CHAIN
+        // INITIALIZE SIGNAL CHAIN
         //      |
         //      |
         //    \ | /
@@ -90,13 +123,13 @@ public class Synth {
         // duty cycles for square waves on carriers are always 100%
         // so set that here as a default
 
-        oscL1.setDuty(1.);
-        oscL2.setDuty(1.);
-        oscR1.setDuty(1.);
-        oscR2.setDuty(1.);
+        oscL1.setDuty(.5);
+        oscL2.setDuty(.5);
+        oscR1.setDuty(.5);
+        oscR2.setDuty(.5);
 
-        mixL=new Mixer(0.5);
-        mixR=new Mixer(0.5);
+        mixL=new Mixer(1);  // signal 1 100%
+        mixR=new Mixer(1);  // signal 1 100%
 
         amodL1= new Oscillator(MODE_LFO,OFF,"L1 AMOD",C.freqAmodL1default);
         amodL2= new Oscillator(MODE_LFO,OFF,"L2 AMOD",C.freqAmodL2default);
@@ -109,7 +142,6 @@ public class Synth {
         oscA = new Oscillator(MODE_EXTRA,SINE,"OSCA",1.);
         oscB = new Oscillator(MODE_EXTRA,SINE,"OSCB",1.);
         oscC = new Oscillator(MODE_EXTRA,SINE,"OSCC",1.);
-
     }
 
     public void start() {
@@ -125,25 +157,26 @@ public class Synth {
                 boolean debug=true;
                 boolean first_time=true;
 
-
                 // Use a smaller buffer for more frequent updates (0.1 seconds)
-                int bufferSize = SAMPLE_RATE / 5;
+                int bufferSize = SAMPLE_RATE / 5;   // not 1/10 because it is stereo
                 float[] stereoBuffer = new float[bufferSize * 2]; // Stereo, so 2 samples per frame
 
                 // Log.i("EASY3","Vol L: "+outMod.volL+" Vol R: "+outMod.volR);
 
                 while (isPlaying) {
 
-                    // Fill the buffer with audio data
+                    // Fill the buffer with audio data. Calculate 1/10 of a second
+                    // on each outer loop.
+
                     for (int i = 0; i < bufferSize; i++) {
 
-                        // SIGNAL CHAIN
+                        // CALCULATE SIGNAL CHAIN (one sample)
                         //      |
                         //      |
                         //    \ | /
                         //     \|/
 
-                        // The Extra osccilators affect various
+                        // The Extra oscilators affect various
                         // other things so do them first.
                         // We don't need the values from these
                         // they are written to the destinations array.
@@ -176,9 +209,6 @@ public class Synth {
                         //----------------------------
 
                         // mix the signals out of the carrier oscillators
-
-                        mixL.setRatio(100-leftMix.getProgress());
-       // TODO                 mixR.setRatio(100-rightMix.getProgress());
 
                         //--------------------------
                         double l3 = mixL.mix(l1, l2);
@@ -285,6 +315,82 @@ public class Synth {
                         double r6=outMod.getR(r5);
                         //-----------------------
 
+                        //-------------------------------------------
+                        // handle the random silence function
+
+                        if ((silenceMode!=0)||(boostMode!=0)) {
+                            dosilence=false;
+
+                            if ((silenceTrigger < 0)&&(!silenceTriggered)) {
+                                silenceTriggered=true;
+
+                                setSilenceTimes();
+
+                                silenceEventCount=0;  // haven't done an event yet
+                                silenceStatus=true;   // start with silence
+                                countdown=silenceDuration;
+                            }
+                            else if (silenceTriggered) {
+                                if (silenceStatus) {
+                                    // silence is active and we are happening!
+                                    dosilence=true;  // mute signal
+                                    countdown-=1./SAMPLE_RATE;
+                                    if (countdown<=0.) {
+                                        silenceStatus=false;
+                                       countdown=silenceDuration2;  // prepare to do the space between
+                                    }
+                                } else { // silenceStatus=false;
+                                    dosilence=false;  // no muting
+                                    countdown-=1./SAMPLE_RATE;
+                                    if (countdown<=0.) {
+                                        silenceStatus=true;         //go back to silence
+                                        silenceEventCount++;
+                                        countdown=silenceDuration;  // prepare to do the silence
+                                        if (silenceEventCount>=silenceEvents) {
+                                            silenceTriggered=false;  // end silence trigger
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                // decrement the counter
+                                silenceTrigger -= 1. / SAMPLE_RATE;
+                                // might trigger next pass
+                            }
+
+                            // now, if silence flag is set apply it to the appropriate signal
+
+                            if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_ON)) {
+                                l6=0.0;   // silence both signals
+                                r6=0.0;
+                            }
+                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_ON)) {
+                                l6=l6*1.08;   // boost both signals
+                                r6=r6*1.08;
+                            }
+                            else if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_LEFT)) {
+                                l6=0.0;    // just left
+                            }
+                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_LEFT)) {
+                                l6=l6*1.08; // just left boost
+                            }
+
+                            else if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_RIGHT)) {
+                                r6=0.0;    // just right silence
+                            }
+                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_LEFT)) {
+                                r6=r6*1.08; // just right boost
+                            }
+                        }
+                        else {
+                            setSilenceTimes();
+                        }
+
+                        // do debug logging if it is enabled
+
+                        // mydebug.log(l5,destinations[DEST_LEFTVOL],l6);
+                        mydebug.log(l3,l4,l6);
+
                         // store output sample
                         // note: left and right seem to be in swapped order
                         // so offset corrects this.
@@ -296,30 +402,34 @@ public class Synth {
                     // Write buffer to audio track (blocking call if buffer is full)
                     audioTrack.write(stereoBuffer, 0, stereoBuffer.length, AudioTrack.WRITE_BLOCKING);
 
-//                    if (debug && first_time) {
-//                        first_time = false;
-//                        try {
-//                            PrintWriter outfile = new PrintWriter(new FileWriter(context.getFilesDir() + "/waveform.dat"));
-//                            for (int i = 0; i < bufferSize; i++) {
-//                                outfile.println("" + i + "\t" + stereoBuffer[i * 2] + ",\t" + stereoBuffer[i * 2 + 1]);
-//                            }
-//                            outfile.close();
-//
-//                        } catch (IOException e) {
-//                            Log.i("EASY3", "Could not write debug file.");
-//                        }
-//                    }
+                    // update the sequencer step
+
+                    sequencer.update(.2);
                 }
-
-                // update the sequencer step
-
-                sequencer.update(.1);
-
             }
 
         });
         audioThread.setPriority(Thread.MAX_PRIORITY);
         audioThread.start();
+    }
+
+    private void setSilenceTimes() {
+        // reset silence Trigger time
+        // range is 75% to 125% of delay time
+
+        silenceTrigger= rnd.nextDouble()*silenceDelay*.5+silenceDelay*.75;
+
+        // silence duration is 66% to 133% of specification
+        // every event in this trigger will be the same
+        // silence length is a percentage of unmodified silenceDelay
+
+        silenceDuration=rnd.nextDouble()*silenceLength*silenceDelay*.66+silenceLength*.66;
+
+        // so this is something like 5% of 30 seconds with some random variance
+        // and then the space between events is simply half whatever this actual
+        // silence turns out to be
+
+        silenceDuration2=silenceDuration/2.;
     }
 
     //-----------------------------------------------------------------------------------
@@ -368,7 +478,7 @@ public class Synth {
         outMod.setVolR(v);
     }
 
-    public void silence() {
+    public void silence() {  // not to be confused with random silence
         outMod.setVolL(0.);
         outMod.setVolR(0.);
     }
@@ -409,10 +519,16 @@ public class Synth {
         padL2.gotoPosition(1.f,1.f,true);
         padR1.gotoPosition(1.f,1.f,true);
         padR2.gotoPosition(1.f,1.f,true);
+
         dutyL1.setProgress(50);   // 50% duty cycle
         dutyR1.setProgress(50);   // 50% duty cycle
         dutyL2.setProgress(50);   // 50% duty cycle
         dutyR2.setProgress(50);   // 50% duty cycle
+
+        dutyL1.setEnabled(false);
+        dutyL2.setEnabled(false);
+        dutyR1.setEnabled(false);
+        dutyR2.setEnabled(false);
 
         // set default amod forms to OFF
 

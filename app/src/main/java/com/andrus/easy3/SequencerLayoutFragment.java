@@ -4,11 +4,15 @@ package com.andrus.easy3;
 import static android.content.ContentValues.TAG;
 import static com.andrus.easy3.C.presets;
 import static com.andrus.easy3.C.sequencer;
+import static com.andrus.easy3.C.synth;
+import static com.andrus.easy3.C.updateSequencerGUI;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +36,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Guideline;
 import androidx.fragment.app.Fragment;
 
+import java.util.Random;
+
 public class SequencerLayoutFragment extends Fragment {
 
     private ImageView scroller;                 //added
@@ -48,6 +54,9 @@ public class SequencerLayoutFragment extends Fragment {
     Guideline guideline14;
     private LinearLayout stepsContainer;
     private ScrollView seqScroll;
+    private Handler handlerxx;
+    Button autoButton;
+    Random rnd=new Random();
 
     // ADDED: Factory method to create a new instance with position
     public static SequencerLayoutFragment newInstance(int position) {
@@ -56,6 +65,7 @@ public class SequencerLayoutFragment extends Fragment {
         Bundle args = new Bundle();
         args.putInt("position", position);
         fragment.setArguments(args);
+        updateSequencerGUI=false;
         return fragment;
     }
 
@@ -85,13 +95,11 @@ public class SequencerLayoutFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         constraintLayout = view.findViewById(R.id.layout4);
         sequencer.clearSteps();
 
         Guideline guideline14 = view.findViewById(R.id.guideline14);
         View titleView = view.findViewById(R.id.title4);
-
 
         runButton = view.findViewById(R.id.seqRun);
         runButton.setOnClickListener(v ->{
@@ -99,14 +107,16 @@ public class SequencerLayoutFragment extends Fragment {
             stopButton.setBackgroundColor(Color.parseColor("#cccccc"));
             runButton.invalidate();
             stopButton.invalidate();
-            if (sequencer.stepCount>0) {
+            if (sequencer.stepCount()>0) {
                 sequencer.active = true;
+                Log.i("SEQUENCER","sequencer active");
                 refreshStepsLayout();
             }
         });
         stopButton = view.findViewById(R.id.seqStop);
         stopButton.setOnClickListener(v ->{
             sequencer.active = false;
+            Log.i("SEQUENCER","sequencer stop");
             runButton.setBackgroundColor(Color.parseColor("#cccccc"));
             stopButton.setBackgroundColor(Color.parseColor("#990000"));
             refreshStepsLayout();
@@ -116,7 +126,6 @@ public class SequencerLayoutFragment extends Fragment {
         clearButton = view.findViewById(R.id.seqClear);
         clearButton.setOnClickListener(v ->{
             sequencer.active = false;
-            sequencer.stepCount=0;
             sequencer.clearSteps();
             stopButton.setBackgroundColor(Color.parseColor("#cccccc"));
             runButton.setBackgroundColor(Color.parseColor("#cccccc"));
@@ -124,6 +133,38 @@ public class SequencerLayoutFragment extends Fragment {
             stopButton.invalidate();
             refreshStepsLayout();
         });
+
+        autoButton = view.findViewById(R.id.auto);
+        autoButton.setOnClickListener(v ->{
+            sequencer.active = false;
+            sequencer.clearSteps();
+
+            // auto Add step views
+            for (int i = 0; i < 40; i++) {
+                PresetItem preset;
+                int rndstep;
+
+                // select a random preset that is valid, duplicates are okay
+
+                do {
+                    rndstep=rnd.nextInt(23);
+                    preset=presets.getInfo(rndstep);
+                }
+                while (!preset.exists);
+                double length=rnd.nextDouble()*180.;
+                sequencer.addStep(length,rndstep,preset.color);
+
+                Sequencer.Step step = sequencer.steps.get(i);
+                View stepView = createStepView(i, step);
+                stepsContainer.addView(stepView);
+            }
+            refreshStepsLayout();
+        });
+
+        // for initial startup, stop button is pressed
+
+        runButton.setBackgroundColor(Color.parseColor("#cccccc"));
+        stopButton.setBackgroundColor(Color.parseColor("#990000"));
 
         // Find the ScrollView
         seqScroll = view.findViewById(R.id.seqScroll);
@@ -164,7 +205,11 @@ public class SequencerLayoutFragment extends Fragment {
             });
         }
         refreshStepsLayout();
+
+        handlerxx=new Handler(Looper.getMainLooper());
+        startUpdatingView();
     }
+
 
     /**
      * Refreshes and redraws the entire steps layout
@@ -200,6 +245,71 @@ public class SequencerLayoutFragment extends Fragment {
             });
         }
     }
+
+    private void startUpdatingView() {
+        // Create a Runnable that updates the display when triggered
+
+        Runnable updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                showStepCursor();
+
+                // update the current step progress
+
+                handlerxx.postDelayed(this, 500);
+            }
+        };
+
+        // Start the updates
+        handlerxx.post(updateRunnable);
+    }
+    private void showStepCursor() {
+        //Log.i("SEQUENCER","Step updater xx.");
+        if (stepsContainer == null ) {
+            return;
+        }
+        // Log.i("SEQUENCER","Step updater.");
+
+        // Update the background color of all step views
+        for (int i = 0; i < stepsContainer.getChildCount(); i++) {
+            View stepView = stepsContainer.getChildAt(i);
+
+            if (stepView instanceof MaterialCardView) {
+                MaterialCardView cardView = (MaterialCardView) stepView;
+
+                // Check if this is the current step
+                if (i == (sequencer.currentStep-1)) {
+                    // Highlight current step with yellow background
+                    cardView.setCardBackgroundColor(Color.parseColor("#FFFF00")); // Yellow
+                    cardView.setCardElevation(8); // Add elevation for active item
+                    cardView.setContentPadding(12, 12, 12, 12); // Slightly larger padding
+                    //Log.i("SEQUENCER","Step "+i+"+1 is active "+ sequencer.currentStep);
+                } else {
+                    // Reset to normal background
+                    cardView.setCardBackgroundColor(Color.parseColor("#999999")); // Gray
+                    cardView.setCardElevation(2); // Lower elevation for inactive items
+                    cardView.setContentPadding(8, 8, 8, 8); // Normal padding
+                    //Log.i("SEQUENCER","Step "+i+"+1 is NOT active. "+ sequencer.currentStep);
+                }
+                cardView.invalidate();
+            }
+        }
+
+        // Optional: Scroll to current step to keep it visible
+        int currentStepIndex = sequencer.currentStep - 1;
+        if (currentStepIndex >= 0 && currentStepIndex < stepsContainer.getChildCount()) {
+            View currentStepView = stepsContainer.getChildAt(currentStepIndex);
+            if (currentStepView != null) {
+                seqScroll.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        seqScroll.smoothScrollTo(0, currentStepView.getTop());
+                    }
+                });
+            }
+        }
+    }
+
 
     /**
      * Creates a view for a single step
@@ -239,7 +349,7 @@ public class SequencerLayoutFragment extends Fragment {
 
         // Step number button
         Button stepNumberBtn = new Button(getContext());
-        stepNumberBtn.setText(String.valueOf(position + 1)); // 1-based for display
+        stepNumberBtn.setText(String.valueOf(presetItem.num)); // 1-based for display
         stepNumberBtn.setBackgroundColor(Color.parseColor(presetItem.color));
         stepNumberBtn.setTextColor(Color.parseColor("#333333"));
 
@@ -247,7 +357,7 @@ public class SequencerLayoutFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Empty listener to be implemented later
-                sequencer.gotoStep(position+1);
+                sequencer.gotoStep(position+2);
                 refreshStepsLayout();
                 Log.d(TAG, "Step button clicked: " + (position + 1));
             }
@@ -330,23 +440,6 @@ public class SequencerLayoutFragment extends Fragment {
     private double parseLength(String lengthStr) {
         return Double.parseDouble(lengthStr.replace("s", ""));
     }
-
-
-
-
-    private void buttonCallback(Context context, TextView textView, Button button, int i) {
-
-
-        // ---------------------------------------> SAVE
-
-
-
-        // ---------------------------------------> LOAD
-
-    }
-
-
-
 
 
 }

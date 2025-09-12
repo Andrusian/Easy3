@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             case 0:
                 return "Left";
             case 1:
-                return "Main";
+                return "Amod";
             case 2:
                 return "Right";
             case 3:

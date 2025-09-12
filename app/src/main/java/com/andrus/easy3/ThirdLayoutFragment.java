@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,9 @@ public class ThirdLayoutFragment extends Fragment {
     private int position;                       //addded
     private Handler handler;
     TextView curVolR;
+    TextView freqOut;
+    TextView freq2Out;
+    TextView mixText;
 
     private static final String[] WAVE_TYPES = {"Sine", "Square", "Saw", "Tri","TENS"};
 
@@ -100,11 +104,69 @@ public class ThirdLayoutFragment extends Fragment {
             });
         }
 
+        freqOut=view.findViewById(R.id.freqOut);
+        freq2Out=view.findViewById(R.id.freq2Out);
         rightMix = view.findViewById(R.id.Rmix);
+        rightMix.setLabel("Mix");
+        rightMix.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
 
-        // TODO
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                double position = 1. - seekBar.getProgress() / 100.;
+                synth.mixR.setRatio(position);
+                Log.i("EASY3", "right mix position "+position);
+            }
+        });
 
+        mixText=view.findViewById((R.id.mix));
+
+        button=view.findViewById((R.id.e));
+        button.setText(String.format("%3.0fHz",freqL1default));
+        button.setOnClickListener ( v-> synth.oscR1.setFreq(freqL1default));
+        button=view.findViewById((R.id.e2));
+        button.setText(String.format("%3.0fHz",freqL2default));
+        button.setOnClickListener ( v-> synth.oscR2.setFreq(freqL2default));
+
+        button=view.findViewById(R.id.a);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(3./2.));
+        button=view.findViewById(R.id.b);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(4./3.));
+        button=view.findViewById(R.id.c);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(5./4.));
+        button=view.findViewById(R.id.d);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(6./5.));
+        button=view.findViewById(R.id.f);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(5./6.));
+        button=view.findViewById(R.id.g);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(4./5.));
+        button=view.findViewById(R.id.h);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(3./4.));
+        button=view.findViewById(R.id.i);
+        button.setOnClickListener ( v-> synth.oscR1.changeFreq(2./3.));
+
+        button=view.findViewById(R.id.a2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(3./2.));
+        button=view.findViewById(R.id.b2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(4./3.));
+        button=view.findViewById(R.id.c2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(5./4.));
+        button=view.findViewById(R.id.d2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(6./5.));
+        button=view.findViewById(R.id.f2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(5./6.));
+        button=view.findViewById(R.id.g2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(4./5.));
+        button=view.findViewById(R.id.h2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(3./4.));
+        button=view.findViewById(R.id.i2);
+        button.setOnClickListener ( v-> synth.oscR2.changeFreq(2./3.));
 
         // note: detune is only offered on primary carrier
 
@@ -194,6 +256,11 @@ public class ThirdLayoutFragment extends Fragment {
             public void run() {
                 // Update the counter and set the text
                 curVolR.setText(String.format("%3.0f %%",synth.getVolR()*100.));
+                String text=String.format("%5.1fHz",synth.oscR1.freq);
+                freqOut.setText(text);
+                text=String.format("%5.1fHz",synth.oscR2.freq);
+                freq2Out.setText(text);
+                mixText.setText(String.format("%3.0f%%",synth.mixR.ratio*100));
 
                 // Schedule the next update in 500 milliseconds (half a second)
                 handler.postDelayed(this, 250);

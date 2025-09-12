@@ -17,7 +17,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:backgroundTint="#000000"
-        android:text="Mute Left"
+        android:text="Mute Right"
+        android:textColor="#ffffff"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/voldefR" />
 
@@ -164,10 +165,13 @@
         style="@android:style/Widget.DeviceDefault.Light.Spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
+        android:background="#333333"
         android:text="Sine"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
+        app:layout_constraintStart_toStartOf="@+id/freqOut"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -185,10 +189,13 @@
         style="@style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginTop="20dp"
+        android:background="#333333"
         android:text="Sine"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline15"
+        app:layout_constraintStart_toStartOf="@+id/guideline9"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -202,7 +209,7 @@
         app:srcCompat="@drawable/ribbed_band_texture_1_" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/mix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
@@ -247,7 +254,7 @@
         app:layout_constraintStart_toEndOf="@+id/textView7"
         app:layout_constraintTop_toTopOf="@+id/textView7" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/Rmix"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

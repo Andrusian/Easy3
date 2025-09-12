@@ -13,15 +13,15 @@
         style="@style/Widget.AppCompat.TextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="20dp"
         android:background="@null"
         android:outlineAmbientShadowColor="@null"
-        android:text="Extras"
+        android:text="Extra Oscillators"
         android:textColor="#ffeeee"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/textView9"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline13"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="82dp"
-        app:layout_constraintGuide_percent=".1" />
+        app:layout_constraintGuide_percent=".6" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline17"
@@ -234,14 +234,113 @@
         app:layout_constraintTop_toBottomOf="@+id/spinnerB" />
 
     <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Rnd Silences / Boosts"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/rndOff"
+        style="@android:style/Widget.Button"
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:background="#C81111"
+        android:backgroundTint="#D5FF104C"
+        android:backgroundTintMode="src_over"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp"
+        android:text="Silence Off"
+        app:layout_constraintEnd_toEndOf="@+id/textView3"
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+    <SeekBar
+        android:id="@+id/silTime1"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:max="60"
+        android:min="2"
+        android:progress="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline13"
+        app:layout_constraintTop_toBottomOf="@+id/rndOff" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="11dp"
+        android:text="Approx Delay"
+        app:layout_constraintBottom_toBottomOf="@+id/silTime1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/silTime1" />
+
+    <SeekBar
+        android:id="@+id/silTime2"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:max="40"
+        android:min="5"
+        android:progress="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline13"
+        app:layout_constraintTop_toBottomOf="@+id/silTime1" />
+
+    <SeekBar
+        android:id="@+id/silEvents"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="26dp"
+        android:max="10"
+        android:min="1"
+        android:progress="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline13"
+        app:layout_constraintTop_toBottomOf="@+id/silTime2" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Event Length %"
+        app:layout_constraintBottom_toBottomOf="@+id/silTime2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/silTime2" />
+
+    <TextView
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/extra_description"
-        android:textColor="#F2F0F0"
-        app:layout_constraintBottom_toTopOf="@+id/scroller5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="9dp"
+        android:text="# Events"
+        app:layout_constraintBottom_toBottomOf="@+id/silEvents"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/silEvents" />
+
+    <Button
+        android:id="@+id/booOff"
+        style="@android:style/Widget.Button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="Boost Off"
+        app:layout_constraintStart_toEndOf="@+id/rndOff"
+        app:layout_constraintTop_toTopOf="@+id/rndOff" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

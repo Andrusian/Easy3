@@ -166,8 +166,8 @@ public class OscSettingsDialog extends Dialog {
         osmax=findViewById(R.id.osmax);
         osmin=findViewById(R.id.osmin);
         osfreq.setText("Freq: ("+String.format("%5.2f",frequencyLimitLow)+"Hz to "+String.format("%5.2f",frequencyLimitHigh)+"Hz)");
-        osmax.setText("Max Value: ( < "+String.format("%5.2f",valueLimitHigh)+")");
-        osmin.setText("Min Value: ( > "+String.format("%5.2f",valueLimitLow)+")");
+        osmax.setText("Max Value: ( <= "+String.format("%5.2f",valueLimitHigh)+")");
+        osmin.setText("Min Value: ( >= "+String.format("%5.2f",valueLimitLow)+")");
         frequencyEdit.setText("1");
         maxValueEdit.setText(String.format("%5.2f",valueLimitHigh));
         minValueEdit.setText(String.format("%5.2f",valueLimitLow));
@@ -282,7 +282,7 @@ public class OscSettingsDialog extends Dialog {
                 return false;
             }
             float phaseShift = Float.parseFloat(phaseText);
-            if (phaseShift < -0.5f || phaseShift > 0.5f) {
+            if (phaseShift <= -0.5f || phaseShift >= 0.5f) {
                 phaseShiftEdit.setError("Phase shift must be between -0.5 and +0.5");
                 return false;
             }

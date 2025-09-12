@@ -153,7 +153,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             Button button = new Button(getContext());
             button.setId(View.generateViewId());
             button.setText(String.valueOf(i + 1));
-            button.setPadding(10, 0, 10, 0);
+            button.setPadding(5, 0, 5, 0);
             button.setTag(Integer.valueOf(i));
 
             // Create LinearLayout params for button
@@ -161,7 +161,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
                     70 * (int) getResources().getDisplayMetrics().density,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            buttonParams.rightMargin = 12 * (int) getResources().getDisplayMetrics().density; // Space between button and text
+            buttonParams.rightMargin = 4 * (int) getResources().getDisplayMetrics().density; // Space between button and text
             button.setLayoutParams(buttonParams);
 
             // Create TextView
@@ -169,6 +169,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             textView.setId(View.generateViewId());
             textView.setText(presetList[i].name);
             textView.setTextColor(Color.parseColor(presetList[i].color));
+            textView.setTextSize(12);
             textView.setMaxLines(2);
 
             // Create LinearLayout params for textview
@@ -229,7 +230,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             button.setId(View.generateViewId());
             button.setText(String.valueOf(i + 1));
             button.setWidth((int) (30));
-            button.setPadding(10, 0, 10, 0);
+            button.setPadding(5, 0, 5, 0);
             button.setTag(Integer.valueOf(i));
 
             // Create ConstraintLayout params for button
@@ -251,6 +252,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             textView = new TextView(getContext());
             textView.setId(View.generateViewId());
             textView.setText(presetList[i].name);
+            textView.setTextSize(12);
             textView.setTextColor(Color.parseColor(presetList[i].color));
             textView.setMaxLines(2);
 
@@ -293,7 +295,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             button.setId(View.generateViewId());
             button.setText(String.valueOf(i + 1));
             button.setWidth((int) (50 * getResources().getDisplayMetrics().density));
-            button.setPadding(10, 0, 10, 0);
+            button.setPadding(5, 0, 5, 0);
             button.setTag(Integer.valueOf(i));
 
             // Create ConstraintLayout params for button
@@ -316,6 +318,7 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
             textView.setId(View.generateViewId());
             textView.setText(presetList[i].name);
             textView.setEnabled(false);
+            textView.setTextSize(12);
             textView.setMaxLines(2);
             textView.setTextColor(Color.parseColor(presetList[i].color));
 

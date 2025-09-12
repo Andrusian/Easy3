@@ -5,6 +5,7 @@ import static android.graphics.Color.*;
 import static com.andrus.easy3.C.*;
 import static com.andrus.easy3.Oscillator.SQUARE;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -43,8 +44,11 @@ public class SecondLayoutFragment extends Fragment {
     AudioDialer audioDial2;
     private Dialog popup;
     private Handler handler3;
+    private Handler handler4;
+    private Button logButton;
+    volatile boolean blockUpdate=false;
 
-    private static final String[] WAVE_TYPES = {"Off", "Sine", "Square", "Saw", "Tri","Random"};
+    private static final String[] WAVE_TYPES = {"Off", "Sine", "Square", "Saw", "Tri","Random","Ramps","Pulses"};
 
     // ADDED: Factory method to create a new instance with position
     public static SecondLayoutFragment newInstance(int position) {
@@ -54,7 +58,6 @@ public class SecondLayoutFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    // ADDED...
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,6 +73,7 @@ public class SecondLayoutFragment extends Fragment {
         return inflater.inflate(R.layout.fraq_second_layout, container, false);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -77,9 +81,13 @@ public class SecondLayoutFragment extends Fragment {
 
         createAnimatedPopup();   // create our phase popup
 
-        // Get the scroller ImageView                   ADDED
-        scroller = view.findViewById(R.id.scroller2);   // ADDED
+        logButton=view.findViewById(R.id.Log);
+        logButton.setOnClickListener(v->
+                synth.mydebug.trigger()
+        );
 
+        // Get the scroller ImageView
+        scroller = view.findViewById(R.id.scroller2);
         if (scroller == null) {
             Log.e(TAG, "scroller2 ImageView not found in layout!");
         } else {
@@ -180,33 +188,42 @@ public class SecondLayoutFragment extends Fragment {
               }
         });
 
-        // DUTY CYCLES (SQUARE WAVE ONLY)
+        // DUTY CYCLES (SQUARE WAVE + ODDBALL WAVES LIKE RAMPS)
 
         dutyL1 = view.findViewById(R.id.dutyL1);  // should be scaled 20-80
+        dutyL1.setLabel("Duty");
         dutyL1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int pos, boolean b) {
+                // int pos=seekBar.getProgress();
                 synth.amodL1.setDuty(pos/100.);
+                // Log.i("EASY3","amodL1 duty: "+pos/100.);
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
         dutyL2 = view.findViewById(R.id.dutyL2);  // should be scaled 20-80
+        dutyL2.setLabel("Duty");
         dutyL2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int pos, boolean b) {
                 synth.amodL2.setDuty(pos/100.);
+                // Log.i("EASY3","amodL1 duty: "+pos/100.);
+
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
         dutyR1 = view.findViewById(R.id.dutyR1);  // should be scaled 20-80
+        dutyR1.setLabel("Duty");
         dutyR1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int pos, boolean b) {
@@ -216,10 +233,13 @@ public class SecondLayoutFragment extends Fragment {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
         });
 
         dutyR2 = view.findViewById(R.id.dutyR2);  // should be scaled 20-80
+        dutyR2.setLabel("Duty");
         dutyR2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int pos, boolean b) {
@@ -229,9 +249,10 @@ public class SecondLayoutFragment extends Fragment {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
+            public void onStopTrackingTouch(SeekBar seekBar) {
 
+            }
+        });
 
         muteButton=view.findViewById((R.id.muteButton));
         muteButton.setOnClickListener ( v->{
@@ -255,9 +276,14 @@ public class SecondLayoutFragment extends Fragment {
         // do the 4 waveformSpinners
 
         waveformSpinner1 = view.findViewById(R.id.L1form);
+        waveformSpinner1.setSelection(0);
         waveformSpinner2 = view.findViewById(R.id.L2form);
+        waveformSpinner1.setSelection(0);
         waveformSpinner3 = view.findViewById(R.id.R1form);
+        waveformSpinner1.setSelection(0);
         waveformSpinner4 = view.findViewById(R.id.R2form);
+        waveformSpinner1.setSelection(0);
+
 
         // Create adapter using the waveform types
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -269,11 +295,6 @@ public class SecondLayoutFragment extends Fragment {
         waveformSpinner2.setAdapter(adapter);
         waveformSpinner3.setAdapter(adapter);
         waveformSpinner4.setAdapter(adapter);
-
-        waveformSpinner1.setSelection(0); // Default to "Disabled"
-        waveformSpinner2.setSelection(0); // Default to "Disabled"
-        waveformSpinner3.setSelection(0); // Default to "Disabled"
-        waveformSpinner4.setSelection(0); // Default to "Disabled"
 
         // Set up the listener for selections
         waveformSpinner1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -331,6 +352,13 @@ public class SecondLayoutFragment extends Fragment {
             }
         });
 
+        // need an updater for the 5 duty seekbars
+
+        // handler4=new Handler(Looper.getMainLooper());
+        //startUpdatingDuty();
+
+
+
          // Access shared data from activity
         MainActivity activity = (MainActivity) requireActivity();
     }
@@ -346,15 +374,9 @@ public class SecondLayoutFragment extends Fragment {
 
         boolean dutyEnabled=false;
         switch (position) {
-            case 0: // None
-            default:
 
-                oscForm=Oscillator.OFF;
-                dutyEnabled=false;
-                break;
             case 1: // Sine
                 oscForm=Oscillator.SINE;
-                dutyEnabled=false;
                 break;
             case 2: // Square
                 oscForm= SQUARE;
@@ -362,15 +384,24 @@ public class SecondLayoutFragment extends Fragment {
                 break;
             case 3: // Saw
                 oscForm=Oscillator.SAW;
-                dutyEnabled=false;
                 break;
             case 4: // Tri
                 oscForm=Oscillator.TRI;
-                dutyEnabled=false;
                 break;
             case 5: // Random
                 oscForm=Oscillator.RANDOM;
-                dutyEnabled=false;
+                break;
+            case 6: // Ramps
+                oscForm=Oscillator.RAMPS;
+                dutyEnabled=true;
+                break;
+            case 7: // Pulses
+                oscForm=Oscillator.PULSES;
+                dutyEnabled=true;
+                break;
+            case 0: // None
+            default:
+                oscForm=Oscillator.OFF;
                 break;
         }
 
@@ -387,7 +418,7 @@ public class SecondLayoutFragment extends Fragment {
         }
         else if (parentId==R.id.R1form) {
             C.synth.amodR1.setForm(oscForm);
-            padR2.setEnabled(dutyEnabled);
+            dutyR1.setEnabled(dutyEnabled);
         }
         else if (parentId==R.id.R2form) {
             C.synth.amodR2.setForm(oscForm);
@@ -438,7 +469,7 @@ public class SecondLayoutFragment extends Fragment {
                 .scaleY(1f)
                 .alpha(1f)
                 .translationY(0f)
-                .setDuration(500)
+                .setDuration(200)
                 .setInterpolator(new OvershootInterpolator(1.2f))
                 .start();
         startUpdatingPhase();
@@ -469,6 +500,9 @@ public class SecondLayoutFragment extends Fragment {
         }
     }
 
+    //==============================================================================
+    // HANDLERS
+    //
     //------------------------------------------------------------------------------
     // updates phase
     //
@@ -499,7 +533,34 @@ public class SecondLayoutFragment extends Fragment {
         handler3.post(updateRunnable);
     }
 
-    @Override
+//------------------------------------------------------------------------
+// DUTY SLIDER HANDLER
+// This doesn't work. It's an concurrency/thread issue I'm pretty sure.
+
+    private void startUpdatingDuty() {
+        // Create a Runnable that updates the AudioDialer
+        Runnable updateRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                //duty seekbars are 20 to 80 but
+                // I don't think overrange/underrange is a problem.
+
+                dutyL1.setProgress((int) Math.floor(synth.oscL1.getDuty()*100.));
+                //Log.i("EASY3","amodL1 duty: "+synth.oscL1.getDuty());
+                dutyL2.setProgress((int) Math.floor(synth.oscL2.getDuty()*100.));
+                dutyR1.setProgress((int) Math.floor(synth.oscR1.getDuty()*100.));
+                dutyR2.setProgress((int) Math.floor(synth.oscR2.getDuty()*100.));
+                handler4.postDelayed(this, 500);
+            }
+        };
+
+        // Start the updates
+        handler4.post(updateRunnable);
+    }
+
+    //===============================================
+@Override
     public void onDestroy() {
         super.onDestroy();
         if (popup != null && popup.isShowing()) {

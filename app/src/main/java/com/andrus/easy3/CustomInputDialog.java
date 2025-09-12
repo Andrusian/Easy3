@@ -57,7 +57,7 @@ public class CustomInputDialog extends DialogFragment {
     private final int[] colorValues = new int[] {
 
             Color.parseColor("#33ff33"),
-            Color.parseColor("#0000ff"),
+            Color.parseColor("#6666ff"),
             Color.parseColor("#FFFF00"),
             Color.parseColor("#ff66ff"),
             Color.parseColor("#FFA500"),

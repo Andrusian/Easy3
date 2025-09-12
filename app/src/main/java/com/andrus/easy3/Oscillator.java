@@ -6,7 +6,6 @@ package com.andrus.easy3;
 // or unipolar. Bipolar is suitable for final signals while unipolar is
 // suitable for amplitude modulation.
 
-import static com.andrus.easy3.C.destinationFlags;
 import static com.andrus.easy3.C.destinations;
 import static java.lang.Math.*;
 
@@ -24,20 +23,35 @@ public class Oscillator {
     public final static int TENS=4;
     public final static int RANDOM=5;
     public final static int OFF =6;
-
-    public final static int MODE_CARRIER=0;
-    public final static int MODE_LFO=1;
-    public final static int MODE_EXTRA=2;
+    public static final int RAMPS = 7;
+    public static final int PULSES = 8;
 
     public final static int SR=48000;          // sample rate
     private static final double MAX_FREQ = 1500.;
     private static final double MIN_FREQ = 250.;
+    int debugCount=0;
 
     Random RNG=new Random();
 
+    //===============================================
+    // Three modes are used:
+    //
+    // CARRIER - the oscillator will always range -1 to 1 (a simple volume is optional). The signal should
+    // always be balanced +/- to avoid any DC bias.
+    //
+    // LFO - the oscillator is used as for Amplitude Modulation purposed. Range is always within 0-1 and
+    //        a the range corresponds to a modification "depth".
+    //
+    // EXTRA - the oscillator could be any range as it is used to modify something else. Frequency might
+    //          be anything, for example. Whereas depth or duty cycle would be 0-1.
+    //
+    public final static int MODE_CARRIER=0;
+    public final static int MODE_LFO=1;
+    public final static int MODE_EXTRA=2;
+
     // fields -----------------------------
 
-    public double duty;            // duty cycle for square waves
+    public volatile double duty;            // duty cycle for square waves
     public volatile int form;
     private int lastForm;
     private int usage;
@@ -81,12 +95,15 @@ public class Oscillator {
     private boolean lastGoingUp=false;
     private int tensX;
     private double lastfreq=-2;
-    int debugCount=0;
     public double depth=0.;
 
     public int destination=0;  // output of this oscillator drives another object
     public float maxValue;     // used for scaling in MODE_EXTRA
     public float minValue;     // used for scaling in MODE_EXTRA
+    private boolean goingDown;
+    private boolean limit;
+    private double rampslope;
+    private double pulseslope;
 
     // constructor--------------------------------
     //
@@ -126,7 +143,11 @@ public class Oscillator {
     }
     public void setDuty(double d) {
         duty=d;
+        // Log.i("OSC","set duty "+duty);
         calcDutyPos();
+    }
+    public double getDuty() {
+        return duty;
     }
 
 
@@ -151,6 +172,8 @@ public class Oscillator {
             if (freq != 0) {     // freq==0 turns off oscillator
                 calcDutyPos();
                 calcPhase();
+                rampslope=2.0/dutyPos;
+                pulseslope=8.0/dutyPos;
                 sawslope = 2.0 / dutyPos;
                 trislope = 4.0 / dutyPos;
                 periodX = (int) Math.floor(SR / freq);
@@ -267,20 +290,29 @@ public class Oscillator {
 
                 if (lastVal < oscval) {
                     goingUp = true;
+                    goingDown=false;
+
                 } else {
                     goingUp = false;
+                    goingDown = true;
                 }
-                if ((lastGoingUp) && (!goingUp)) {
-                    sawval = 1;     // reset position at peak
+                if (lastGoingUp!=goingUp) {  // have we changed direction
+                    if (goingUp) {           // yes - we are at min, do minor correction
+                        sawval=-1;
+                    }
+                    else {
+                        sawval=+1;           // yes - at max limit
+                    }
                 }
-                lastGoingUp = goingUp;
+                else {
+                    if (goingUp) {
+                        sawval += trislope;
+                    } else {
+                        sawval -= trislope;
+                    }
+                }
 
-                // based on sine, duty cycle ignored
-                if (goingUp) {
-                    sawval += trislope;
-                } else {
-                    sawval -= trislope;
-                }
+                lastGoingUp = goingUp;
                 out = sawval;
                 break;
 
@@ -291,6 +323,83 @@ public class Oscillator {
                 }
                 sawval += sawslope;
                 out = sawval;
+                break;
+
+            case RAMPS:
+
+                // RAMPS is like a SAW wave but allows for a low
+                // duty cycle for use as an AMOD.
+                // works well, but minor bug when amod frequency is changed
+                // seems to clip at very low frequencies... maybe dutyPos
+                // isn't updating.
+
+                if ((mode==MODE_LFO)||(mode==MODE_EXTRA)) {
+
+                    // MODE is LFO, factors in duty
+                    if (posRepeat + phX > 0) {
+                        if ((posRepeat + phX) < dutyPos) {
+                            sawval += rampslope;
+                            out=sawval;
+                        } else {
+                            out = -1;
+                            sawval=-1;
+                        }
+                    }
+                    else {
+                        sawval=-1;
+                        out=-1;
+                    }
+                }
+                else {
+                    sawval=-1;
+                    out=-1;
+                }
+//                debugCount++;
+//                if (debugCount==500) {
+//                    debugCount=0;
+//                    Log.i("RAMPS","count"+debugCount+" val: "+String.format("%5.2f",out)+ "posRepeat "+posRepeat);
+//                }
+                break;
+
+            case PULSES:
+                // PULSES is similar to a square wave but with rounder pulses. It does duty cycle.
+                // it is intended for AMODs.
+
+                if ((mode==MODE_LFO)||(mode==MODE_EXTRA)) {
+
+                    // MODE is LFO, factors in duty
+                    if (posRepeat + phX > 0) {
+                        if ((posRepeat + phX) < dutyPos/4) {          // rise
+                            sawval += pulseslope;
+                            out=sawval;
+                        }
+                        else if ((posRepeat + phX) < dutyPos*3/4) {   // max pulse
+                            sawval =1;
+                            out=sawval;
+                        }
+                        else if ((posRepeat + phX) < dutyPos) {       // fall
+                            sawval -=pulseslope;
+                            out=sawval;
+                        }
+                        else {
+                            out = -1;
+                            sawval=-1;
+                        }
+                    }
+                    else {
+                        sawval=-1;
+                        out=-1;
+                    }
+                }
+                else {
+                    sawval=-1;
+                    out=-1;
+                }
+//                debugCount++;
+//                if (debugCount==500) {
+//                    debugCount=0;
+//                    Log.i("RAMPS","count"+debugCount+" val: "+String.format("%5.2f",out)+ "posRepeat "+posRepeat);
+//                }
                 break;
 
             // SQUARE - version 2... based on SINE
@@ -304,7 +413,9 @@ public class Oscillator {
 
             case SQUARE:
 
-                if (mode == MODE_CARRIER) {
+                if ((mode == MODE_CARRIER)||(mode==MODE_EXTRA)) {
+                    // duty is ignored
+
                     if (oscval > 0) {
                         out = 1.f;
                     } else {
@@ -312,7 +423,7 @@ public class Oscillator {
                     }
                 }
                 else {
-                    // MODE is LFO or EXTRA
+                    // MODE is LFO, factors in duty
 
                     if ((posRepeat + phX) < dutyPos) {
                         out = 1;
@@ -421,11 +532,11 @@ public class Oscillator {
             // it doesn't take an input and allows any value range.
             //
             // Recommended limits are set by the ExtrasFragment.
+            // 'out' is -1 to 1 at this point.
 
-            float outScaled=(float) out*((maxValue-minValue)+minValue);
-
+            double outScaled=minValue+(out+1)*(maxValue-minValue)/2;
             if (destination != 0) {
-                destinations[destination] = outScaled;
+                destinations[destination] = (float) outScaled;
             }
             return outScaled;
         }
@@ -442,6 +553,8 @@ public class Oscillator {
 
         this.maxValue=maxValue;
         this.minValue=minValue;
+
+        //Log.i("EASY3","Extra oscillator range "+minValue+" to "+ minValue);
 
     }
 

@@ -1,15 +1,17 @@
 package com.andrus.easy3;
 
 import static com.andrus.easy3.C.presets;
+import static com.andrus.easy3.C.updateSequencerGUI;
+
+import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Sequencer {
-    public final int MAXSTEPS=24;
+    public final int MAXSTEPS=80;
     public boolean active=false;
-    int stepCount=0;
-    int currentStep=0;
+    public volatile int currentStep=0;
     public ArrayList<Step> steps;
     public double timePassed;
 
@@ -17,9 +19,20 @@ public class Sequencer {
         steps=new ArrayList<>();
     }
 
+    public int stepCount() {
+        return steps.size();
+    }
+
     public void gotoStep(int i) {
-        currentStep=i;
+        currentStep=i-1;
         timePassed=0.;
+        if (active) {
+            steps.get(currentStep).start();
+            Log.i("SEQUENCER", "STARTING step ---> "+i);
+        }
+        else {
+            Log.i("SEQUENCER", "Selected step "+i+" but not active.");
+        }
     }
 
     //------------------------------------------------
@@ -28,22 +41,36 @@ public class Sequencer {
     public void update(double interval) {
         if (active) {              // only update if active
 
+            // Log.i("SEQUENCER","update (step "+currentStep+" )");
             // if a step is available start it
 
-            if ((currentStep == 0) && (steps.size() > 0)) {
-                currentStep++;
-                steps.get(currentStep).start();
+            if ((currentStep == 0) && (steps.size() >= 0)) {
+                // start at first step if nothing selected
+                currentStep=1;
+                steps.get(currentStep-1).start();
+                Log.i("SEQUENCER","sequencer start first step");
+                updateSequencerGUI=true;
             }
 
             // if a step is already running, update it
 
             else {
                 if (currentStep > 0) {
-                    if (steps.get(currentStep).update(interval)) {
+                    // Log.i("SEQUENCER","update sequencer step "+currentStep+" "+steps.get(currentStep-1).percent);
+                    if (steps.get(currentStep-1).update(interval)) {
+                        Log.i("SEQUENCER", "Step currentStep done.");
                         currentStep++;
                         if (currentStep > steps.size()) {
-                            steps.get(currentStep).start();
+                            // rewind to begining of list if at end
+                            currentStep = 1;
+                            Log.i("SEQUENCER", "Rewinding to first step");
+
                         }
+                        Step thisStep=steps.get(currentStep-1);
+                        thisStep.start();
+                        Log.i("SEQUENCER", "Starting step "+currentStep+" length "+thisStep.length+" preset "+thisStep.preset);
+                        updateSequencerGUI=true;
+
                     }
                 }
             }
@@ -70,7 +97,9 @@ public class Sequencer {
 
         void start () {
             timePassed=0;
+            // Log.i("SEQUENCER","Start load "+ preset);
             presets.load(preset);
+            updateSequencerGUI=true;
         }
 
         // update for delta time
@@ -90,7 +119,6 @@ public class Sequencer {
 
     Sequencer () {
         steps = new ArrayList<>();
-        stepCount=0;
     }
 
     // add a step and return true if successful

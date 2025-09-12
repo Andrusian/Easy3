@@ -4,6 +4,7 @@ package com.andrus.easy3;
 import static android.content.ContentValues.TAG;
 import static com.andrus.easy3.C.*;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -24,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,7 +34,33 @@ import androidx.fragment.app.Fragment;
 
 public class FirstLayoutFragment extends Fragment {
 
-    private Button button;
+    private Button button1;
+    private Button button2;
+    private Button button3;
+    private Button button4;
+    private Button button5;
+    private Button button6;
+    private Button button7;
+    private Button button8;
+    private Button button9;
+    private Button button10;
+    private Button button11;
+    private Button button12;
+    private Button button13;
+    private Button button14;
+    private Button button15;
+    private Button button16;
+    private Button button17;
+    private Button button18;
+    private Button button19;
+
+    private Button button20;
+    private Button button21;
+    private Button button22;
+    private Button button23;
+    private Button button24;
+
+    private Button voldef;
     TextView textVol;
     private Dialog popup;
     private Button carrier_phase_button;
@@ -47,6 +75,7 @@ public class FirstLayoutFragment extends Fragment {
     View popupView;
     Button cancelButton;
     AudioDialer audioDial1;
+    TextView mixText;
 
     private static final String[] WAVE_TYPES = {"Sine", "Square", "Saw", "Tri", "TENS"};
 
@@ -78,6 +107,7 @@ public class FirstLayoutFragment extends Fragment {
         return inflate;
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -124,73 +154,96 @@ public class FirstLayoutFragment extends Fragment {
         );
 
         leftMix = view.findViewById(R.id.Lmix);
-        button=view.findViewById((R.id.e));
-        button.setText(String.format("%3.0fHz",freqL1default));
-        button.setOnClickListener ( v-> synth.oscL1.setFreq(freqL1default));
-        button=view.findViewById((R.id.e2));
-        button.setText(String.format("%3.0fHz",freqL2default));
-        button.setOnClickListener ( v-> synth.oscL1.setFreq(freqL2default));
+        leftMix.setLabel("Mix");
+        leftMix.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
 
-        button=view.findViewById(R.id.a);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(3./2.));
-        button=view.findViewById(R.id.b);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(4./3.));
-        button=view.findViewById(R.id.c);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(5./4.));
-        button=view.findViewById(R.id.d);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(6./5.));
-        button=view.findViewById(R.id.f);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(5./6.));
-        button=view.findViewById(R.id.g);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(4./5.));
-        button=view.findViewById(R.id.h);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(3./4.));
-        button=view.findViewById(R.id.i);
-        button.setOnClickListener ( v-> synth.oscL1.changeFreq(2./3.));
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
-        button=view.findViewById(R.id.a2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(3./2.));
-        button=view.findViewById(R.id.b2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(4./3.));
-        button=view.findViewById(R.id.c2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(5./4.));
-        button=view.findViewById(R.id.d2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(6./5.));
-        button=view.findViewById(R.id.f2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(5./6.));
-        button=view.findViewById(R.id.g2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(4./5.));
-        button=view.findViewById(R.id.h2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(3./4.));
-        button=view.findViewById(R.id.i2);
-        button.setOnClickListener ( v-> synth.oscL2.changeFreq(2./3.));
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                double position = 1. - seekBar.getProgress() / 100.;
+                synth.mixL.setRatio(position);
+                Log.i("EASY3", "left mix position "+position);
+            }
+        });
 
+        button20=view.findViewById(R.id.muteL);
+        button20.setOnClickListener ( v-> C.synth.setVolL(0));
 
         // note: detune is only offered on primary carrier
 
-        button=view.findViewById((R.id.detunePlusR));
-        button.setOnClickListener ( v-> synth.oscL1.incFreq(.3F));
-        button=view.findViewById((R.id.detuneMinusR));
-        button.setOnClickListener ( v-> synth.oscL1.incFreq(-.3F));
+        button21=view.findViewById((R.id.detunePlusL));
+        button21.setOnClickListener ( v-> synth.oscL1.incFreq(.3F));
 
-        button=view.findViewById((R.id.boostR));
-        button.setOnClickListener (
+        button22=view.findViewById((R.id.detuneMinusL));
+        button22.setOnClickListener ( v-> synth.oscL1.incFreq(-.3F));
+
+        button23=view.findViewById((R.id.boostL));
+        button23.setOnClickListener (
                 v-> C.synth.boostL(.01)
         );
-        button=view.findViewById((R.id.duckR));
-        button.setOnClickListener (
+        button24=view.findViewById((R.id.duckL));
+        button24.setOnClickListener (
                 v-> C.synth.duckL(.01)
         );
-        button=view.findViewById((R.id.voldefR));
-        button.setOnClickListener (
+        voldef=view.findViewById((R.id.voldefL));
+        voldef.setOnClickListener (
                 v-> {
                     synth.outMod.doRampin(1.);
                     C.synth.setVolL(.7);
-                }
-                );
+                });
 
-        button=view.findViewById(R.id.muteR);
-        button.setOnClickListener ( v-> C.synth.setVolL(0));
+
+        mixText=view.findViewById(R.id.mix);
+
+        button1=view.findViewById((R.id.e));
+        button1.setText(String.format("%3.0fHz",freqL1default));
+        button1.setOnClickListener ( v-> synth.oscL1.setFreq(freqL1default));
+
+        button2=view.findViewById((R.id.e2));
+        button2.setText(String.format("%3.0fHz",freqL2default));
+        button2.setOnClickListener ( v-> synth.oscL2.setFreq(freqL2default));
+
+        button4=view.findViewById(R.id.a);
+        button4.setOnClickListener ( v-> synth.oscL1.changeFreq(3./2.));
+
+        button5=view.findViewById(R.id.b);
+        button5.setOnClickListener ( v-> synth.oscL1.changeFreq(4./3.));
+        button6=view.findViewById(R.id.c);
+        button6.setOnClickListener ( v-> synth.oscL1.changeFreq(5./4.));
+        button7=view.findViewById(R.id.d);
+        button7.setOnClickListener ( v-> synth.oscL1.changeFreq(6./5.));
+        button8=view.findViewById(R.id.f);
+        button8.setOnClickListener ( v-> synth.oscL1.changeFreq(5./6.));
+        button9=view.findViewById(R.id.g);
+        button9.setOnClickListener ( v-> synth.oscL1.changeFreq(4./5.));
+        button10=view.findViewById(R.id.h);
+        button10.setOnClickListener ( v-> synth.oscL1.changeFreq(3./4.));
+        button11=view.findViewById(R.id.i);
+        button11.setOnClickListener ( v-> synth.oscL1.changeFreq(2./3.));
+
+        button12=view.findViewById(R.id.a2);
+        button12.setOnClickListener ( v-> synth.oscL2.changeFreq(3./2.));
+        button13=view.findViewById(R.id.b2);
+        button13.setOnClickListener ( v-> synth.oscL2.changeFreq(4./3.));
+        button14=view.findViewById(R.id.c2);
+        button14.setOnClickListener ( v-> synth.oscL2.changeFreq(5./4.));
+        button15=view.findViewById(R.id.d2);
+        button15.setOnClickListener ( v-> synth.oscL2.changeFreq(6./5.));
+        button16=view.findViewById(R.id.f2);
+        button16.setOnClickListener ( v-> synth.oscL2.changeFreq(5./6.));
+        button17=view.findViewById(R.id.g2);
+        button17.setOnClickListener ( v-> synth.oscL2.changeFreq(4./5.));
+        button18=view.findViewById(R.id.h2);
+        button18.setOnClickListener ( v-> synth.oscL2.changeFreq(3./4.));
+        button19=view.findViewById(R.id.i2);
+        button19.setOnClickListener ( v-> synth.oscL2.changeFreq(2./3.));
+
 
         freqOut=view.findViewById(R.id.freqOut);
         freq2Out=view.findViewById(R.id.freq2Out);
@@ -198,8 +251,8 @@ public class FirstLayoutFragment extends Fragment {
 
         // do the 4 waveformSpinners
 
-        waveformSpinnerL1 = view.findViewById(R.id.formR);
-        waveformSpinnerL2 = view.findViewById(R.id.formR2);
+        waveformSpinnerL1 = view.findViewById(R.id.formL);
+        waveformSpinnerL2 = view.findViewById(R.id.formL2);
 
         // Create adapter using the waveform types
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -213,7 +266,7 @@ public class FirstLayoutFragment extends Fragment {
         waveformSpinnerL1.setSelection(0); // Default to "Disabled"
         waveformSpinnerL2.setSelection(0); // Default to "Disabled"
 
-        curVolL=view.findViewById((R.id.curVolR));
+        curVolL=view.findViewById((R.id.curVolL));
         handler1=new Handler(Looper.getMainLooper());
         handler2=new Handler(Looper.getMainLooper());
         startUpdatingTextView();
@@ -254,6 +307,7 @@ public class FirstLayoutFragment extends Fragment {
     private void startUpdatingTextView() {
         // Create a Runnable that updates the TextView
         Runnable updateRunnable = new Runnable() {
+            @SuppressLint("DefaultLocale")
             @Override
             public void run() {
                 // Update the counter and set the textviews
@@ -263,6 +317,7 @@ public class FirstLayoutFragment extends Fragment {
                 freqOut.setText(text);
                 text=String.format("%5.1fHz",synth.oscL2.freq);
                 freq2Out.setText(text);
+                mixText.setText(String.format("%3.0f%%",synth.mixL.ratio*100));
 
                 // Schedule the next update in 500 milliseconds (half a second)
                 handler1.postDelayed(this, 250);              }
@@ -283,10 +338,7 @@ public class FirstLayoutFragment extends Fragment {
         // This selection is specific to Carrier Oscillators.
 
         switch (position) {
-            case 0: // None
-            default:
-                oscForm=Oscillator.SINE;
-                break;
+
             case 1: // Square
                 oscForm=Oscillator.SQUARE;
                 break;
@@ -298,6 +350,10 @@ public class FirstLayoutFragment extends Fragment {
                 break;
             case 4: // TENS
                 oscForm=Oscillator.TENS;
+                break;
+            case 0: // None
+            default:
+                oscForm=Oscillator.SINE;
                 break;
         }
 
@@ -363,7 +419,7 @@ public class FirstLayoutFragment extends Fragment {
                 .scaleY(1f)
                 .alpha(1f)
                 .translationY(0f)
-                .setDuration(500)
+                .setDuration(200)
                 .setInterpolator(new OvershootInterpolator(1.2f))
                 .start();
         startUpdatingPhase();

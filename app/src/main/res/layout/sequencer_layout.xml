@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout6"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:background="#444455"
     android:outlineProvider="none">
@@ -53,9 +53,12 @@
         android:id="@+id/seqRun"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Run"
+        android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title5" />
 
@@ -63,20 +66,27 @@
         android:id="@+id/seqStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Stop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/seqRun"
         app:layout_constraintTop_toBottomOf="@+id/title5" />
 
     <Button
         android:id="@+id/seqClear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="11dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="#666688"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:text="Clear"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/auto"
         app:layout_constraintTop_toBottomOf="@+id/title5" />
 
     <ScrollView
@@ -96,6 +106,20 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
     </ScrollView>
+
+    <Button
+        android:id="@+id/auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:backgroundTint="#FF9800"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="Auto Fill"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/seqStop"
+        app:layout_constraintTop_toBottomOf="@+id/title5" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

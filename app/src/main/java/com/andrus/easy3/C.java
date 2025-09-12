@@ -11,69 +11,26 @@ import android.widget.Spinner;
 public class C {
     public static volatile double patch[]=new double[200];
 
-    static public final int PATCH_PAD1X=0;
-    static public final int PATCH_PAD1Y=1;
-
-    static public final int PATCH_PAD2X=2;
-    static public final int PATCH_PAD2Y=3;
-
-    static public final int PATCH_PAD3X=4;
-    static public final int PATCH_PAD3Y=5;
-
-    static public final int PATCH_PAD4X=6;
-    static public final int PATCH_PAD4Y=7;
-
-    static public final int PATCH_PAD5X=8;
-    static public final int PATCH_PAD6X=9;
-    static public final int PATCH_PAD7X=10;
-    static public final int PATCH_PAD8X=11;
-
-    static public final int PATCH_LFREQ1=12;
-    static public final int PATCH_LFREQ2=13;
-
-    static public final int PATCH_RFREQ1=14;
-    static public final int PATCH_RFREQ2=15;
-
-    static public final int PATCH_LMIX=16;
-    static public final int PATCH_RMIX=17;
-
-
-    static public final int PATCH_SPARE1=50;
-    static public final int PATCH_SPARE2=51;
-    static public final int PATCH_SPARE3=52;
-    static public final int PATCH_SPARE4=53;
-    static public final int PATCH_SPARE5=54;
-
-    static public final int PATCH_CONSTANT_VOL_DEFAULT=100;
-    static public final int PATCH_CONSTANT_ONE=101;
-    static public final int PATCH_CONSTANT_TWO=102;
-    static public final int PATCH_CONSTANT_FIVE=103;
-    static public final int PATCH_CONSTANT_TEN=104;
-    static public final int PATCH_CONSTANT_TWENTY=105;
-    static public final int PATCH_CONSTANT_THREEQUARTERS=106;
-    static public final int PATCH_CONSTANT_HALF=107;
-    static public final int PATCH_CONSTANT_THIRD=108;
-    static public final int PATCH_CONSTANT_QUARTER=109;
-    static public final int PATCH_CONSTANT_FIFTH=110;
 
     static public final double freqL1default=750.;
     static public final double freqL2default=900.;
-    static public final double freqR1default=700.;
+    static public final double freqR1default=750.;
     static public final double freqR2default=840.;
     static public final double freqAmodL1default=.3;
     static public final double freqAmodL2default=10;
     static public final double freqAmodR1default=.3;
     static public final double freqAmodR2default=10;
 
-    static volatile public SeekBar rightMix;
+    public static LabeledSeekBar leftMix;
+    static volatile public LabeledSeekBar rightMix;
     static volatile public AudioTouchPad padL1;
     static volatile public AudioTouchPad padL2;
-    static volatile public SeekBar dutyL1;
-    static volatile public SeekBar dutyL2;
+    static volatile public LabeledSeekBar dutyL1;
+    static volatile public LabeledSeekBar dutyL2;
     static volatile public AudioTouchPad padR1;
     static volatile public AudioTouchPad padR2;
-    static volatile public SeekBar dutyR1;
-    static volatile public SeekBar dutyR2;
+    static volatile public LabeledSeekBar dutyR1;
+    static volatile public LabeledSeekBar dutyR2;
     static volatile public Spinner waveformSpinner1;
     static volatile public Spinner waveformSpinner2;
     static volatile public Spinner waveformSpinner3;
@@ -83,6 +40,8 @@ public class C {
     static volatile public Spinner waveformSpinnerL2;
     static volatile public Spinner waveformSpinnerR1;
     static volatile public Spinner waveformSpinnerR2;
+
+    static volatile public boolean updateSequencerGUI=false;
 
     // globals for important objects
 
@@ -113,13 +72,17 @@ public class C {
     static final int DEST_L2FREQ=11;
     static final int DEST_R2FREQ=12;
     static final int DEST_R2DUTY=13;
-    public static SeekBar leftMix;
+    static final int SILENCE_OFF=0;
+    static final int SILENCE_ON=1;
+    static final int SILENCE_RIGHT=2;
+    static final int SILENCE_LEFT=3;
 
     public static float freqScaleY(float input) {
         return ((input-300.f) / (1200.f - 300.f));
     }
 
     public static SequencerLayoutFragment sequencerFragment;
+
 
 
 }

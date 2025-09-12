@@ -201,7 +201,7 @@ public class AudioTouchPad extends View {
 
         // Draw axis labels if provided
         if (xAxisLabel != null) {
-            canvas.drawText(xAxisLabel, width / 2, height - 20f, labelPaint);
+            canvas.drawText(xAxisLabel, width / 2, 50f, labelPaint);
         }
 
         if (yAxisLabel != null) {

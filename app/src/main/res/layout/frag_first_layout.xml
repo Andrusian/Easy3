@@ -10,7 +10,7 @@
 
 
     <Button
-        android:id="@+id/muteR"
+        android:id="@+id/muteL"
         style="@style/Widget.Material3.Button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
@@ -18,8 +18,9 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="#000000"
         android:text="Mute Left"
+        android:textColor="#ffffff"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/voldefR" />
+        app:layout_constraintTop_toBottomOf="@+id/voldefL" />
 
     <TextView
         android:id="@+id/textView"
@@ -105,7 +106,7 @@
         app:layout_constraintGuide_percent=".66" />
 
     <Button
-        android:id="@+id/detunePlusR"
+        android:id="@+id/detunePlusL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -115,7 +116,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
     <Button
-        android:id="@+id/detuneMinusR"
+        android:id="@+id/detuneMinusL"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -123,10 +124,10 @@
         android:backgroundTint="@color/freqalt"
         android:text="Detune -"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detunePlusR" />
+        app:layout_constraintTop_toBottomOf="@+id/detunePlusL" />
 
     <Button
-        android:id="@+id/boostR"
+        android:id="@+id/boostL"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -137,7 +138,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/duckR"
+        android:id="@+id/duckL"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
@@ -148,23 +149,23 @@
         app:layout_constraintTop_toTopOf="@+id/guideline12" />
 
     <Button
-        android:id="@+id/voldefR"
+        android:id="@+id/voldefL"
         style="@style/Widget.Material3.Button"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
         android:backgroundTint="#666666"
         android:text="Vol Default"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/duckR" />
+        app:layout_constraintBottom_toTopOf="@+id/guideline8"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Spinner
-        android:id="@+id/formR"
+        android:id="@+id/formL"
         style="@android:style/Widget.DeviceDefault.Light.Spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:background="#333333"
         android:text="Sine"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
@@ -181,11 +182,12 @@
         app:layout_constraintGuide_percent=".95" />
 
     <Spinner
-        android:id="@+id/formR2"
+        android:id="@+id/formL2"
         style="@style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:background="#333333"
         android:text="Sine"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline15"
@@ -202,7 +204,7 @@
         app:srcCompat="@drawable/ribbed_band_texture_1_" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/mix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="10dp"
@@ -225,26 +227,28 @@
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
         android:layout_marginBottom="10dp"
         android:text="vol:"
         android:textColor="#ffffffff"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/boostR"
-        tools:layout_editor_absoluteX="10dp" />
+        app:layout_constraintBottom_toTopOf="@+id/boostL"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/curVolR"
+        android:id="@+id/curVolL"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="10dp"
         android:background="#222222"
         android:fontFamily="sans-serif-black"
         android:text="0 %"
         android:textAlignment="textEnd"
         android:textColor="#ffff00"
         android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@+id/textView7"
-        app:layout_constraintTop_toTopOf="@+id/textView7" />
+        app:layout_constraintBottom_toTopOf="@+id/boostL"
+        app:layout_constraintStart_toEndOf="@+id/textView7" />
 
     <Button
         android:id="@+id/carrier_phase_button"
@@ -260,7 +264,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline18" />
 
-    <SeekBar
+    <com.andrus.easy3.LabeledSeekBar
         android:id="@+id/Lmix"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
