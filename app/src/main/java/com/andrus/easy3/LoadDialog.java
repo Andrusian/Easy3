@@ -5,8 +5,14 @@ import static com.andrus.easy3.C.sequencer;
 import static com.andrus.easy3.C.sequencerFragment;
 
 import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -72,12 +78,39 @@ public class LoadDialog extends Dialog {
                             // Perform delete action
                             Toast.makeText(getContext(), "Item " + num + " Deleted", Toast.LENGTH_SHORT).show();
                             dismiss();
-                            String filename = new String(getContext().getFilesDir() + "/preset" + num + ".ini");
-                            Log.i("EASY3", "Would delete " + filename + " here.");
+                            String filenameToDelete = "preset" + num + ".ini";
+                            Log.i("EASY3", "Would delete " + filenameToDelete + " here.");
 
-                            // Create a File object for the file to delete
-                            File fileToDelete = new File(filename);
-                            boolean deleted = fileToDelete.delete();
+                            ContentResolver resolver = getContext().getContentResolver();
+
+                            // Query for the file
+                            String[] projection = {MediaStore.MediaColumns._ID};
+                            String selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? AND " +
+                                    MediaStore.MediaColumns.RELATIVE_PATH + "=?";
+                            String[] selectionArgs = {filenameToDelete, Environment.DIRECTORY_DOCUMENTS + "/Easy3/"};
+
+                            try (Cursor cursor = resolver.query(
+                                    MediaStore.Files.getContentUri("external"),
+                                    projection,
+                                    selection,
+                                    selectionArgs,
+                                    null)) {
+
+                                if (cursor != null && cursor.moveToFirst()) {
+                                    int idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+                                    long id = cursor.getLong(idColumn);
+                                    Uri fileUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), id);
+
+                                    int deleted = resolver.delete(fileUri, null, null);
+                                    boolean success = deleted > 0;
+
+                                    Log.i("EASY3", "File deleted: " + success);
+                                } else {
+                                    Log.i("EASY3", "File not found for deletion");
+                                }
+                            } catch (Exception e) {
+                                Log.e("EASY3", "Error deleting file", e);
+                            }
 
 
                             if (loadListener != null) {

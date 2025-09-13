@@ -314,8 +314,8 @@ public class ExtrasFragment extends Fragment implements AdapterView.OnItemSelect
                 silOff.invalidate();
 
 
-                Log.i("extras","silence: "+synth.silenceTrigger+" "+synth.silenceMode+" triggered:"
-                        +synth.silenceTriggered+" status:"+synth.silenceStatus+" cd:"+synth.countdown+" dosil:"+synth.dosilence+" ev:"+synth.silenceEventCount+"/"+synth.silenceEvents);
+                // Log.i("extras","silence: "+synth.silenceTrigger+" "+synth.silenceMode+" triggered:"
+                //         +synth.silenceTriggered+" status:"+synth.silenceStatus+" cd:"+synth.countdown+" dosil:"+synth.dosilence+" ev:"+synth.silenceEventCount+"/"+synth.silenceEvents);
                 // Schedule next update
                 handler.postDelayed(this, 500);
             }

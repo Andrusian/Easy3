@@ -1,8 +1,16 @@
 package com.andrus.easy3;
 
 import static com.andrus.easy3.C.*;
+
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,6 +20,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
 
@@ -36,109 +45,118 @@ public class Presets {
             return;
         }
 
-        String filename = new String(context.getFilesDir() + "/preset" + number + ".ini");
-        try {
-            out = new PrintWriter(new FileWriter(filename));
+        // Using MediaStore for documents (Android 10+)
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "preset" + number + ".ini");
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/x-ini");
+        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOCUMENTS + "/Easy3");
 
-            writeSection("identification");
-            saveString("name", name);
-            saveString("desc", desc);
-            saveInt("color", color);
+        Uri uri = resolver.insert(MediaStore.Files.getContentUri("external"), contentValues);
+        if (uri != null) {
+            try (OutputStream outStream = resolver.openOutputStream(uri)) {
+                out = new PrintWriter(outStream);
 
-            // save the output module first
+                    writeSection("identification");
+                    saveString("name", name);
+                    saveString("desc", desc);
+                    saveInt("color", color);
 
-            writeSection("output");
+                    // save the output module first
 
-            saveItem("outL", synth.outMod.volL);
-            saveItem("outR", synth.outMod.volR);
+                    writeSection("output");
 
-            writeSection("carriers");
+                    saveItem("outL", synth.outMod.volL);
+                    saveItem("outR", synth.outMod.volR);
 
-            // store carrier wave settings
+                    writeSection("carriers");
 
-            saveItem("leftMix", leftMix.getProgress());
-            saveItem("leftFreq", synth.oscL1.freq);
-            saveItem("leftPhase", synth.oscL2.getPhase());
-            saveItem("leftFreq2", synth.oscL2.freq);
+                    // store carrier wave settings
 
-            saveItem("rightMix", rightMix.getProgress());
-            saveItem("rightFreq", synth.oscR1.freq);
-            saveItem("rightFreq2", synth.oscR2.freq);
+                    saveItem("leftMix", leftMix.getProgress());
+                    saveItem("leftFreq", synth.oscL1.freq);
+                    saveItem("leftPhase", synth.oscL2.getPhase());
+                    saveItem("leftFreq2", synth.oscL2.freq);
 
-            saveItem("waveformL1", waveformSpinnerL1.getSelectedItemPosition());
-            saveItem("waveformL2", waveformSpinnerL2.getSelectedItemPosition());
-            saveItem("waveformR1", waveformSpinnerR1.getSelectedItemPosition());
-            saveItem("waveformR2", waveformSpinnerR2.getSelectedItemPosition());
+                    saveItem("rightMix", rightMix.getProgress());
+                    saveItem("rightFreq", synth.oscR1.freq);
+                    saveItem("rightFreq2", synth.oscR2.freq);
 
-            writeSection("modulators");
+                    saveItem("waveformL1", waveformSpinnerL1.getSelectedItemPosition());
+                    saveItem("waveformL2", waveformSpinnerL2.getSelectedItemPosition());
+                    saveItem("waveformR1", waveformSpinnerR1.getSelectedItemPosition());
+                    saveItem("waveformR2", waveformSpinnerR2.getSelectedItemPosition());
 
-            // save the amplitude modulators
+                    writeSection("modulators");
 
-            saveItem("amodL1form", waveformSpinner1.getSelectedItemPosition());
-            saveItem("amodL1freq",synth.amodL1.freq);
-            saveItem("amodL1depth",synth.amodL1.depth);
-            saveItem("amodL1duty",synth.amodL1.duty);
-            saveItem("amodL1phase",synth.amodL1.getPhase());
+                    // save the amplitude modulators
 
-            saveItem("amodL2form", waveformSpinner2.getSelectedItemPosition());
-            saveItem("amodL2freq",synth.amodL2.freq);
-            saveItem("amodL2depth",synth.amodL2.depth);
-            saveItem("amodL2duty",synth.amodL2.duty);
+                    saveItem("amodL1form", waveformSpinner1.getSelectedItemPosition());
+                    saveItem("amodL1freq", synth.amodL1.freq);
+                    saveItem("amodL1depth", synth.amodL1.depth);
+                    saveItem("amodL1duty", synth.amodL1.duty);
+                    saveItem("amodL1phase", synth.amodL1.getPhase());
 
-            saveItem("amodR1form", waveformSpinner3.getSelectedItemPosition());
-            saveItem("amodR1freq",synth.amodR1.freq);
-            saveItem("amodR1depth",synth.amodR1.depth);
-            saveItem("amodR1duty",synth.amodR1.duty);
+                    saveItem("amodL2form", waveformSpinner2.getSelectedItemPosition());
+                    saveItem("amodL2freq", synth.amodL2.freq);
+                    saveItem("amodL2depth", synth.amodL2.depth);
+                    saveItem("amodL2duty", synth.amodL2.duty);
 
-            saveItem("amodR2form", waveformSpinner4.getSelectedItemPosition());
-            saveItem("amodR2freq",synth.amodR2.freq);
-            saveItem("amodR2depth",synth.amodR2.depth);
-            saveItem("amodR2duty",synth.amodR2.duty);
+                    saveItem("amodR1form", waveformSpinner3.getSelectedItemPosition());
+                    saveItem("amodR1freq", synth.amodR1.freq);
+                    saveItem("amodR1depth", synth.amodR1.depth);
+                    saveItem("amodR1duty", synth.amodR1.duty);
 
-            // extra oscillator settings
+                    saveItem("amodR2form", waveformSpinner4.getSelectedItemPosition());
+                    saveItem("amodR2freq", synth.amodR2.freq);
+                    saveItem("amodR2depth", synth.amodR2.depth);
+                    saveItem("amodR2duty", synth.amodR2.duty);
 
-            writeSection("extras");
+                    // extra oscillator settings
 
-            saveItem("oscAfreq",synth.oscA.freq);
-            saveInt2("oscAform",synth.oscA.form);
-            saveItem("oscAduty",synth.oscA.duty);
-            saveItem("oscAphase",synth.oscA.getPhase());
-            saveInt2("oscAdestination",synth.oscA.destination);
-            saveBoolean("oscAenabled",destinationFlags[synth.oscA.destination]);
-            saveItem("oscAmax",synth.oscA.maxValue);
-            saveItem("oscAmin",synth.oscA.minValue);
+                    writeSection("extras");
 
-            saveItem("oscBfreq",synth.oscB.freq);
-            saveInt2("oscBform",synth.oscB.form);
-            saveItem("oscBduty",synth.oscB.duty);
-            saveItem("oscBphase",synth.oscB.getPhase());
-            saveInt2("oscBdestination",synth.oscB.destination);
-            saveBoolean("oscBenabled",destinationFlags[synth.oscB.destination]);
-            saveItem("oscBmax",synth.oscB.maxValue);
-            saveItem("oscBmin",synth.oscB.minValue);
+                    saveItem("oscAfreq", synth.oscA.freq);
+                    saveInt2("oscAform", synth.oscA.form);
+                    saveItem("oscAduty", synth.oscA.duty);
+                    saveItem("oscAphase", synth.oscA.getPhase());
+                    saveInt2("oscAdestination", synth.oscA.destination);
+                    saveBoolean("oscAenabled", destinationFlags[synth.oscA.destination]);
+                    saveItem("oscAmax", synth.oscA.maxValue);
+                    saveItem("oscAmin", synth.oscA.minValue);
 
-            saveItem("oscCfreq",synth.oscC.freq);
-            saveInt2("oscCform",synth.oscC.form);
-            saveItem("oscCduty",synth.oscC.duty);
-            saveItem("oscCphase",synth.oscC.getPhase());
-            saveInt2("oscCdestination",synth.oscC.destination);
-            saveBoolean("oscCenabled",destinationFlags[synth.oscC.destination]);
-            saveItem("oscCmax",synth.oscC.maxValue);
-            saveItem("oscCmin",synth.oscC.minValue);
+                    saveItem("oscBfreq", synth.oscB.freq);
+                    saveInt2("oscBform", synth.oscB.form);
+                    saveItem("oscBduty", synth.oscB.duty);
+                    saveItem("oscBphase", synth.oscB.getPhase());
+                    saveInt2("oscBdestination", synth.oscB.destination);
+                    saveBoolean("oscBenabled", destinationFlags[synth.oscB.destination]);
+                    saveItem("oscBmax", synth.oscB.maxValue);
+                    saveItem("oscBmin", synth.oscB.minValue);
 
-            // silences boosts
+                    saveItem("oscCfreq", synth.oscC.freq);
+                    saveInt2("oscCform", synth.oscC.form);
+                    saveItem("oscCduty", synth.oscC.duty);
+                    saveItem("oscCphase", synth.oscC.getPhase());
+                    saveInt2("oscCdestination", synth.oscC.destination);
+                    saveBoolean("oscCenabled", destinationFlags[synth.oscC.destination]);
+                    saveItem("oscCmax", synth.oscC.maxValue);
+                    saveItem("oscCmin", synth.oscC.minValue);
 
-            saveInt2("silenceMode",synth.silenceMode);
-            saveInt2("boostMode",synth.boostMode);
-            saveItem("silenceDelay",synth.silenceDelay);
-            saveItem("silenceLength",synth.silenceLength);
-            saveInt2("silenceEvents",synth.silenceEvents);
+                    // silences boosts
 
-            out.close();
-            out=null;
+                    saveInt2("silenceMode", synth.silenceMode);
+                    saveInt2("boostMode", synth.boostMode);
+                    saveItem("silenceDelay", synth.silenceDelay);
+                    saveItem("silenceLength", synth.silenceLength);
+                    saveInt2("silenceEvents", synth.silenceEvents);
 
-        } catch (RuntimeException | IOException e) {
-            throw new RuntimeException(e);
+                    out.flush();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -197,9 +215,30 @@ public class Presets {
                 InputStream inputStream = assetManager.open("preset" + number + ".ini");
                 in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             } else {
-                filename = new String(context.getFilesDir() + "/preset" + number + ".ini");
-                inF = new FileReader(filename);
-                in = new BufferedReader(inF);
+                // Find the file using MediaStore
+                ContentResolver resolver = context.getContentResolver();
+                String[] projection = {MediaStore.MediaColumns._ID};
+                String selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? AND " +
+                        MediaStore.MediaColumns.RELATIVE_PATH + "=?";
+                String[] selectionArgs = {"preset" + number + ".ini", Environment.DIRECTORY_DOCUMENTS + "/Easy3/"};
+                //Log.i("EASY3","File: "+selectionArgs[1]+" "+selectionArgs[0]);
+
+                Cursor cursor = resolver.query(MediaStore.Files.getContentUri("external"), projection, selection, selectionArgs, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    int idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+                    long id = cursor.getLong(idColumn);
+                    Uri fileUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), id);
+                    cursor.close();
+
+                    InputStream inputStream = resolver.openInputStream(fileUri);
+                    in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                    //Log.i("EASY3","Found preset "+number);
+                } else {
+                    //Log.i("EASY3","NOT found preset "+number);
+                    if (cursor != null) cursor.close();
+                    throw new FileNotFoundException("preset" + number + ".ini not found");
+                }
             }
 
             String input;
@@ -217,13 +256,13 @@ public class Presets {
 
                     if (tag.equals("name")) {
                         presetInfo.name = setting;
-                        Log.i("EASY3", "Preset " + number + " name " + presetInfo.name);
+                        //Log.i("EASY3", "Preset " + number + " name " + presetInfo.name);
                     } else if (tag.equals("desc")) {
                         presetInfo.desc = setting;
-                        Log.i("EASY3", "Preset " + number + " desc " + presetInfo.desc);
+                        //Log.i("EASY3", "Preset " + number + " desc " + presetInfo.desc);
                     } else if (tag.equals("color")) {
                         presetInfo.color = items[1];
-                        Log.i("EASY3", "Preset " + number + " color " + presetInfo.color);
+                        //Log.i("EASY3", "Preset " + number + " color " + presetInfo.color);
                     }
                 }
             }
@@ -254,9 +293,27 @@ public class Presets {
                 InputStream inputStream = assetManager.open("preset" + number + ".ini");
                 in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             } else {
-                filename = new String(context.getFilesDir() + "/preset" + number + ".ini");
-                inF = new FileReader(filename);
-                in = new BufferedReader(inF);
+                // Find the file using MediaStore
+                ContentResolver resolver = context.getContentResolver();
+                String[] projection = {MediaStore.MediaColumns._ID};
+                String selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? AND " +
+                        MediaStore.MediaColumns.RELATIVE_PATH + "=?";
+                String[] selectionArgs = {"preset" + number + ".ini", Environment.DIRECTORY_DOCUMENTS + "/Easy3/"};
+
+                Cursor cursor = resolver.query(MediaStore.Files.getContentUri("external"), projection, selection, selectionArgs, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    int idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+                    long id = cursor.getLong(idColumn);
+                    Uri fileUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), id);
+                    cursor.close();
+
+                    InputStream inputStream = resolver.openInputStream(fileUri);
+                    in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                } else {
+                    if (cursor != null) cursor.close();
+                    throw new FileNotFoundException("preset" + number + ".ini not found");
+                }
             }
 
             String input;
