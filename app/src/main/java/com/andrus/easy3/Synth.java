@@ -154,8 +154,8 @@ public class Synth {
         audioThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean debug=true;
-                boolean first_time=true;
+                boolean debug = true;
+                boolean first_time = true;
 
                 // Use a smaller buffer for more frequent updates (0.1 seconds)
                 int bufferSize = SAMPLE_RATE / 5;   // not 1/10 because it is stereo
@@ -182,13 +182,13 @@ public class Synth {
                         // they are written to the destinations array.
 
                         if (oscA.isActive()) {
-                            double ex1=oscA.val(1.);
+                            double ex1 = oscA.val(1.);
                         }
                         if (oscB.isActive()) {
-                            double ex2=oscB.val(1.);
+                            double ex2 = oscB.val(1.);
                         }
                         if (oscC.isActive()) {
-                            double ex3=oscC.val(1.);
+                            double ex3 = oscC.val(1.);
                         }
 
                         // carrier sound oscillators
@@ -226,50 +226,44 @@ public class Synth {
                         if (destinationFlags[DEST_L1FREQ]) {
                             amodL1.setFreq(destinations[DEST_L1FREQ]);
                             C.padL1.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padL1.setOverride(false);
                         }
                         if (destinationFlags[DEST_L1DEPTH]) {
                             amodL1.setDepth(destinations[DEST_L1DEPTH]);
                             C.padL1.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padL1.setOverride(false);
                         }
 
                         if (destinationFlags[DEST_L1DUTY]) {
                             amodL1.setDuty(destinations[DEST_L1DUTY]);
+                        } else {
                         }
-                        else {
-                              }
 
                         if (destinationFlags[DEST_R1FREQ]) {
                             amodR1.setFreq(destinations[DEST_R1FREQ]);
                             C.padR1.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padR1.setOverride(false);
                         }
 
                         if (destinationFlags[DEST_R1DEPTH]) {
                             amodR1.setDuty(destinations[DEST_R1DEPTH]);
                             C.padR1.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padR1.setOverride(false);
                         }
 
 
                         if (destinationFlags[DEST_R1DUTY]) {
                             amodR1.setDuty(destinations[DEST_R1DUTY]);
+                        } else {
                         }
-                        else {
-                          }
 
                         //-----------------------
-                        double l4=amodL1.val(l3);
-                        double r4=amodR1.val(r3);
+                        double l4 = amodL1.val(l3);
+                        double r4 = amodR1.val(r3);
                         //-----------------------
 
                         // second layer amplitude modulation units
@@ -277,28 +271,25 @@ public class Synth {
                         if (destinationFlags[DEST_L2FREQ]) {
                             amodL2.setFreq(destinations[DEST_L2FREQ]);
                             C.padL2.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padL2.setOverride(false);
                         }
 
                         if (destinationFlags[DEST_R2FREQ]) {
                             amodR2.setFreq(destinations[DEST_R2FREQ]);
                             C.padR2.setOverride(true);
-                        }
-                        else {
+                        } else {
                             C.padR2.setOverride(false);
                         }
 
                         if (destinationFlags[DEST_R2DUTY]) {
                             amodR2.setDuty(destinations[DEST_R2DUTY]);
+                        } else {
                         }
-                        else {
-                            }
 
                         //-----------------------
-                        double l5=amodL2.val(l4);
-                        double r5=amodR2.val(r4);
+                        double l5 = amodL2.val(l4);
+                        double r5 = amodR2.val(r4);
                         //-----------------------
 
                         // output module
@@ -311,48 +302,46 @@ public class Synth {
                         }
 
                         //-----------------------
-                        double l6=outMod.getL(l5);
-                        double r6=outMod.getR(r5);
+                        double l6 = outMod.getL(l5);
+                        double r6 = outMod.getR(r5);
                         //-----------------------
 
                         //-------------------------------------------
                         // handle the random silence function
 
-                        if ((silenceMode!=0)||(boostMode!=0)) {
-                            dosilence=false;
+                        if ((silenceMode != 0) || (boostMode != 0)) {
+                            dosilence = false;
 
-                            if ((silenceTrigger < 0)&&(!silenceTriggered)) {
-                                silenceTriggered=true;
+                            if ((silenceTrigger < 0) && (!silenceTriggered)) {
+                                silenceTriggered = true;
 
                                 setSilenceTimes();
 
-                                silenceEventCount=0;  // haven't done an event yet
-                                silenceStatus=true;   // start with silence
-                                countdown=silenceDuration;
-                            }
-                            else if (silenceTriggered) {
+                                silenceEventCount = 0;  // haven't done an event yet
+                                silenceStatus = true;   // start with silence
+                                countdown = silenceDuration;
+                            } else if (silenceTriggered) {
                                 if (silenceStatus) {
                                     // silence is active and we are happening!
-                                    dosilence=true;  // mute signal
-                                    countdown-=1./SAMPLE_RATE;
-                                    if (countdown<=0.) {
-                                        silenceStatus=false;
-                                       countdown=silenceDuration2;  // prepare to do the space between
+                                    dosilence = true;  // mute signal
+                                    countdown -= 1. / SAMPLE_RATE;
+                                    if (countdown <= 0.) {
+                                        silenceStatus = false;
+                                        countdown = silenceDuration2;  // prepare to do the space between
                                     }
                                 } else { // silenceStatus=false;
-                                    dosilence=false;  // no muting
-                                    countdown-=1./SAMPLE_RATE;
-                                    if (countdown<=0.) {
-                                        silenceStatus=true;         //go back to silence
+                                    dosilence = false;  // no muting
+                                    countdown -= 1. / SAMPLE_RATE;
+                                    if (countdown <= 0.) {
+                                        silenceStatus = true;         //go back to silence
                                         silenceEventCount++;
-                                        countdown=silenceDuration;  // prepare to do the silence
-                                        if (silenceEventCount>=silenceEvents) {
-                                            silenceTriggered=false;  // end silence trigger
+                                        countdown = silenceDuration;  // prepare to do the silence
+                                        if (silenceEventCount >= silenceEvents) {
+                                            silenceTriggered = false;  // end silence trigger
                                         }
                                     }
                                 }
-                            }
-                            else {
+                            } else {
                                 // decrement the counter
                                 silenceTrigger -= 1. / SAMPLE_RATE;
                                 // might trigger next pass
@@ -360,47 +349,44 @@ public class Synth {
 
                             // now, if silence flag is set apply it to the appropriate signal
 
-                            if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_ON)) {
-                                l6=0.0;   // silence both signals
-                                r6=0.0;
+                            if (silenceTriggered && dosilence && (silenceMode == SILENCE_ON)) {
+                                l6 = 0.0;   // silence both signals
+                                r6 = 0.0;
+                            } else if (silenceTriggered && dosilence && (boostMode == SILENCE_ON)) {
+                                l6 = l6 * 1.08;   // boost both signals
+                                r6 = r6 * 1.08;
+                            } else if (silenceTriggered && dosilence && (silenceMode == SILENCE_LEFT)) {
+                                l6 = 0.0;    // just left
+                            } else if (silenceTriggered && dosilence && (boostMode == SILENCE_LEFT)) {
+                                l6 = l6 * 1.08; // just left boost
+                            } else if (silenceTriggered && dosilence && (silenceMode == SILENCE_RIGHT)) {
+                                r6 = 0.0;    // just right silence
+                            } else if (silenceTriggered && dosilence && (boostMode == SILENCE_LEFT)) {
+                                r6 = r6 * 1.08; // just right boost
                             }
-                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_ON)) {
-                                l6=l6*1.08;   // boost both signals
-                                r6=r6*1.08;
-                            }
-                            else if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_LEFT)) {
-                                l6=0.0;    // just left
-                            }
-                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_LEFT)) {
-                                l6=l6*1.08; // just left boost
-                            }
-
-                            else if (silenceTriggered&&dosilence&&(silenceMode==SILENCE_RIGHT)) {
-                                r6=0.0;    // just right silence
-                            }
-                            else if (silenceTriggered&&dosilence&&(boostMode==SILENCE_LEFT)) {
-                                r6=r6*1.08; // just right boost
-                            }
-                        }
-                        else {
+                        } else {
                             setSilenceTimes();
                         }
 
                         // do debug logging if it is enabled
 
                         // mydebug.log(l5,destinations[DEST_LEFTVOL],l6);
-                        mydebug.log(l3,l4,l6);
+                        mydebug.log(l3, l4, l6);
 
                         // store output sample
                         // note: left and right seem to be in swapped order
                         // so offset corrects this.
 
                         stereoBuffer[i * 2] = (float) l6;
-                        stereoBuffer[i * 2+1] = (float) r6;
+                        stereoBuffer[i * 2 + 1] = (float) r6;
                     }
 
                     // Write buffer to audio track (blocking call if buffer is full)
                     audioTrack.write(stereoBuffer, 0, stereoBuffer.length, AudioTrack.WRITE_BLOCKING);
+
+                    // calculate the visualization data
+
+                    calculateVisualizationData(stereoBuffer, 0, bufferSize);
 
                     // update the sequencer step
 
@@ -412,6 +398,151 @@ public class Synth {
         audioThread.setPriority(Thread.MAX_PRIORITY);
         audioThread.start();
     }
+
+    //=====================================================================
+    // Visualization calculations
+    //---------------------------------------------------------------------
+
+    public void calculateVisualizationData(float[] stereoBuffer, int startIndex, int numFrames) {
+        // Copy waveform data
+        int samples = Math.min(numFrames, AudioVizData.WAVEFORM_SIZE);
+        for (int i = 0; i < samples; i++) {
+            int idx = (startIndex + i) * 2;
+            AudioVizData.leftWaveform[i] = stereoBuffer[idx];
+            AudioVizData.rightWaveform[i] = stereoBuffer[idx + 1];
+        }
+        AudioVizData.waveformSamples = samples;
+
+        // Compute FFT spectrum (use first 32k samples from buffer)
+        computeSpectrum(stereoBuffer, startIndex);
+
+        AudioVizData.dataReady = true;
+    }
+
+    private void computeSpectrum(float[] stereoBuffer, int startIndex) {
+        final int FFT_SIZE = 32768; // 2^15
+
+        // Extract channels for FFT
+        float[] leftChannel = new float[FFT_SIZE];
+        float[] rightChannel = new float[FFT_SIZE];
+
+        int available = Math.min(FFT_SIZE, stereoBuffer.length / 2 - startIndex);
+        for (int i = 0; i < available; i++) {
+            int idx = (startIndex + i) * 2;
+            leftChannel[i] = stereoBuffer[idx];
+            rightChannel[i] = stereoBuffer[idx + 1];
+        }
+
+        // Compute FFT magnitude
+        float[] leftMag = computeFFTMagnitude(leftChannel);
+        float[] rightMag = computeFFTMagnitude(rightChannel);
+
+        // Map to logarithmic frequency bins (30Hz - 4kHz)
+        mapToFrequencyBins(leftMag, AudioVizData.leftSpectrum, FFT_SIZE);
+        mapToFrequencyBins(rightMag, AudioVizData.rightSpectrum, FFT_SIZE);
+    }
+
+    private float[] computeFFTMagnitude(float[] signal) {
+        int n = signal.length;
+        float[] real = new float[n];
+        float[] imag = new float[n];
+
+        // Apply Hamming window
+        for (int i = 0; i < n; i++) {
+            float window = (float) (0.54 - 0.46 * Math.cos(2 * Math.PI * i / (n - 1)));
+            real[i] = signal[i] * window;
+            imag[i] = 0;
+        }
+
+        // Perform FFT
+        fft(real, imag);
+
+        // Compute magnitude (only need first half)
+        int halfN = n / 2;
+        float[] magnitude = new float[halfN];
+        for (int i = 0; i < halfN; i++) {
+            magnitude[i] = (float) Math.sqrt(real[i] * real[i] + imag[i] * imag[i]);
+        }
+
+        return magnitude;
+    }
+
+    private void fft(float[] real, float[] imag) {
+        int n = real.length;
+        if (n <= 1) return;
+
+        // Bit reversal
+        int j = 0;
+        for (int i = 0; i < n - 1; i++) {
+            if (i < j) {
+                float tempR = real[i];
+                real[i] = real[j];
+                real[j] = tempR;
+                float tempI = imag[i];
+                imag[i] = imag[j];
+                imag[j] = tempI;
+            }
+            int k = n / 2;
+            while (k <= j) {
+                j -= k;
+                k /= 2;
+            }
+            j += k;
+        }
+
+        // Cooley-Tukey FFT
+        for (int len = 2; len <= n; len *= 2) {
+            float angle = (float) (-2 * Math.PI / len);
+            float wlenR = (float) Math.cos(angle);
+            float wlenI = (float) Math.sin(angle);
+
+            for (int i = 0; i < n; i += len) {
+                float wR = 1;
+                float wI = 0;
+
+                for (int k = 0; k < len / 2; k++) {
+                    int idx1 = i + k;
+                    int idx2 = i + k + len / 2;
+
+                    float tR = wR * real[idx2] - wI * imag[idx2];
+                    float tI = wR * imag[idx2] + wI * real[idx2];
+
+                    real[idx2] = real[idx1] - tR;
+                    imag[idx2] = imag[idx1] - tI;
+                    real[idx1] += tR;
+                    imag[idx1] += tI;
+
+                    float tempW = wR;
+                    wR = wR * wlenR - wI * wlenI;
+                    wI = tempW * wlenI + wI * wlenR;
+                }
+            }
+        }
+    }
+
+    private void mapToFrequencyBins(float[] fftMag, float[] bins, int fftSize) {
+        final int SAMPLE_RATE = 48000;
+        final float MIN_FREQ = 125f;
+        final float MAX_FREQ = 4000f;
+
+        int numBins = bins.length;
+        float freqPerBin = (float) SAMPLE_RATE / fftSize;
+
+        // Logarithmic frequency mapping
+        for (int i = 0; i < numBins; i++) {
+            float t = (float) i / (numBins - 1);
+            float freq = MIN_FREQ * (float) Math.pow(MAX_FREQ / MIN_FREQ, t);
+            int fftBin = (int) (freq / freqPerBin);
+
+            if (fftBin < fftMag.length) {
+                bins[i] = fftMag[fftBin];
+            }
+        }
+    }
+
+    //=====================================================================
+    // routines for the random silence / boost effects
+    //---------------------------------------------------------------------
 
     private void setSilenceTimes() {
         // reset silence Trigger time
@@ -493,7 +624,7 @@ public class Synth {
         return value;
     }
 
-    //----------------------------------------------------
+    //=============================================================================
     // This sets every component to hard-coded defaults.
     // This is done through touchpads where possible.
 

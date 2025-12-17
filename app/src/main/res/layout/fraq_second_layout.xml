@@ -71,9 +71,10 @@
 
     <Button
         android:id="@+id/amod_phase_button"
+        style="@style/Widget.App.Button.Compact"
         android:layout_width="80dp"
         android:layout_height="38dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
         android:backgroundTint="@color/phase"
         android:paddingLeft="0dp"
         android:paddingTop="0dp"
@@ -81,7 +82,8 @@
         android:paddingBottom="0dp"
         android:text="Phase"
         app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/guideline" />
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline5"
@@ -153,33 +155,31 @@
 
     <Button
         android:id="@+id/muteButton"
+        style="@style/Widget.App.Button.Compact"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="10dp"
         android:backgroundTint="#666666"
-        android:paddingLeft="0dp"
-        android:paddingTop="0dp"
-        android:paddingRight="0dp"
+        android:insetLeft="0dp"
+        android:insetRight="0dp"
         android:paddingBottom="0dp"
         android:text="Mute"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.941" />
+        app:layout_constraintStart_toEndOf="@+id/button3"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button3"
+        style="@style/Widget.App.Button.Compact"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginEnd="10dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="10dp"
         android:backgroundTint="@color/freqalt"
         android:paddingLeft="0dp"
         android:paddingTop="0dp"
         android:paddingRight="0dp"
         android:paddingBottom="0dp"
         android:text="Smooth"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/muteButton"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toEndOf="@+id/amod_phase_button"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
@@ -250,19 +250,16 @@
         app:layout_constraintTop_toBottomOf="@+id/padR2" />
 
     <Button
-        android:id="@+id/Log"
-        android:layout_width="50dp"
-        android:layout_height="30dp"
-        android:layout_marginStart="40dp"
-        android:backgroundTint="#ff0000"
-        android:paddingLeft="0dp"
-        android:paddingTop="0dp"
-        android:paddingRight="0dp"
-        android:paddingBottom="0dp"
-        android:text="Log"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/visbutton"
+        style="@style/Widget.App.Button.Compact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Visualize"
+        app:layout_constraintStart_toEndOf="@+id/muteButton"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

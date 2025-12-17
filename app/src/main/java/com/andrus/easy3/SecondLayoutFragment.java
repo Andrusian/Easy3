@@ -6,6 +6,7 @@ import static com.andrus.easy3.C.*;
 import static com.andrus.easy3.Oscillator.SQUARE;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -25,6 +26,7 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
@@ -33,7 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class SecondLayoutFragment extends Fragment {
-    private Button button;
+    private Button visButton;
     private ImageView scroller;                 //added
     private int position;                       //addded
     private Button muteButton;
@@ -47,6 +49,7 @@ public class SecondLayoutFragment extends Fragment {
     private Handler handler4;
     private Button logButton;
     volatile boolean blockUpdate=false;
+    AudioVisualizationFragment fragment;
 
     private static final String[] WAVE_TYPES = {"Off", "Sine", "Square", "Saw", "Tri","Random","Ramps","Pulses"};
 
@@ -80,11 +83,6 @@ public class SecondLayoutFragment extends Fragment {
         handler3=new Handler(Looper.getMainLooper());
 
         createAnimatedPopup();   // create our phase popup
-
-        logButton=view.findViewById(R.id.Log);
-        logButton.setOnClickListener(v->
-                synth.mydebug.trigger()
-        );
 
         // Get the scroller ImageView
         scroller = view.findViewById(R.id.scroller2);
@@ -129,6 +127,11 @@ public class SecondLayoutFragment extends Fragment {
         amod_phase_button.setOnClickListener(
                 dialog -> showAnimatedPopup()
         );
+
+        visButton=view.findViewById(R.id.visbutton);
+
+        visButton.setOnClickListener(dc -> popupVisualization());
+
 
         padL1 = view.findViewById(R.id.padL1);
         padL1.setXAxisLabel("Freq");
@@ -361,6 +364,39 @@ public class SecondLayoutFragment extends Fragment {
 
          // Access shared data from activity
         MainActivity activity = (MainActivity) requireActivity();
+    }
+
+    private void popupVisualization() {
+        // Create a dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+
+        // Create a container for the fragment
+        FrameLayout container = new FrameLayout(requireContext());
+        container.setId(View.generateViewId());
+        container.setLayoutParams(new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT));
+
+        // Add the fragment to the container
+        AudioVisualizationFragment audioVisFragment = new AudioVisualizationFragment();
+        getChildFragmentManager().beginTransaction()
+                .replace(container.getId(), audioVisFragment)
+                .commit();
+
+        // Set the container as the dialog view
+        builder.setView(container);
+        builder.setTitle("Audio Visualization");
+        builder.setNegativeButton("Close", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Make it bigger
+        dialog.getWindow().setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                (int)(getResources().getDisplayMetrics().heightPixels * 0.8)
+        );
+
     }
 
     //========================================================================------------------------------

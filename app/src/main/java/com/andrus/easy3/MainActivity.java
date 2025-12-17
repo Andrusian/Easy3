@@ -49,13 +49,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize ViewPager2
         viewPager = findViewById(R.id.viewPager);
-        viewPager.setOffscreenPageLimit(5);
+        viewPager.setOffscreenPageLimit(6);
         tabLayout = findViewById(R.id.tabLayout);
 
         // Create adapter and set to ViewPager2
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
         viewPager.setAdapter(adapter);
-        viewPager.setCurrentItem(1, false);
+        viewPager.setCurrentItem(2, false);
 
         // Initialize the scroll helper AFTER setting up ViewPager2 and adapter
         scrollHelper = new ViewPager2ScrollHelper(viewPager, true);
@@ -94,16 +94,18 @@ public class MainActivity extends AppCompatActivity {
     private String heading(int position) {
         switch (position) {
             case 0:
-                return "Left";
+                return "Vis";
             case 1:
-                return "Amod";
+                return "-L-";
             case 2:
-                return "Right";
+                return "-A-";
             case 3:
-                return "Extras";
+                return "-R-";
             case 4:
-                return "Pre";
+                return "Ex";
             case 5:
+                return "Pre";
+            case 6:
                 return "Seq";
             default:
                 return "tktktk";
@@ -131,16 +133,18 @@ public class MainActivity extends AppCompatActivity {
             // Return the appropriate fragment for each position
             switch (position) {
                 case 0:
-                    return FirstLayoutFragment.newInstance(position);
+                    return AudioVisualizationFragment.newInstance(position);
                 case 1:
-                    return SecondLayoutFragment.newInstance(position);
+                    return FirstLayoutFragment.newInstance(position);
                 case 2:
-                    return ThirdLayoutFragment.newInstance(position);
+                    return SecondLayoutFragment.newInstance(position);
                 case 3:
-                    return ExtrasFragment.newInstance(position);
+                    return ThirdLayoutFragment.newInstance(position);
                 case 4:
-                    return FourthLayoutFragment.newInstance(position);
+                    return ExtrasFragment.newInstance(position);
                 case 5:
+                    return FourthLayoutFragment.newInstance(position);
+                case 6:
                     return SequencerLayoutFragment.newInstance(position);
                 default:
                     return SecondLayoutFragment.newInstance(position);
@@ -149,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return 6; // Number of pages
+            return 7; // Number of pages
         }
     }
 }
