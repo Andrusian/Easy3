@@ -42,13 +42,6 @@ public class Presets {
 
     public void save(int number, String name, String desc, int color) {
 
-        if (number <= 6) {
-
-            // TO DO: pop up an error maybe?
-
-            return;
-        }
-
         File dir = new File(context.getFilesDir(), "Easy3");
         if (!dir.exists()) dir.mkdirs();
 
@@ -360,17 +353,16 @@ public class Presets {
                             dutyR2.setProgress((int) settingNum);
                         } else if (tag.equals("amodL1form")) {
                             double settingNum = Double.parseDouble(items[1]);
-
-//                       waveformSpinner1.setSelection((int)settingNum);
+                            waveformSpinner1.setSelection((int)settingNum);
                         } else if (tag.equals("amodL2form")) {
                             double settingNum = Double.parseDouble(items[1]);
-//                        waveformSpinner2.setSelection((int)settingNum);
+                          waveformSpinner2.setSelection((int)settingNum);
                         } else if (tag.equals("amodR1form")) {
                             double settingNum = Double.parseDouble(items[1]);
-//                        waveformSpinner3.setSelection((int)settingNum);
+                          waveformSpinner3.setSelection((int)settingNum);
                         } else if (tag.equals("amodR2form")) {
                             double settingNum = Double.parseDouble(items[1]);
-//                        waveformSpinner4.setSelection((int)settingNum);
+                          waveformSpinner4.setSelection((int)settingNum);
                         } else if (tag.equals("outL")) {
                             double settingNum = Double.parseDouble(items[1]);
                             synth.outMod.setVolL(settingNum);

@@ -123,11 +123,11 @@ public class FourthLayoutFragment extends Fragment implements CustomInputDialog.
         containerLayout.setOrientation(LinearLayout.VERTICAL);
 
 // Add border to the container
-        GradientDrawable border = new GradientDrawable();
-        border.setShape(GradientDrawable.RECTANGLE);
-        border.setStroke(2 * (int) getResources().getDisplayMetrics().density, Color.WHITE); // 2dp border
-        border.setCornerRadius(8 * (int) getResources().getDisplayMetrics().density); // 8dp corners
-        containerLayout.setBackground(border);
+//        GradientDrawable border = new GradientDrawable();
+//        border.setShape(GradientDrawable.RECTANGLE);
+//        border.setStroke(2 * (int) getResources().getDisplayMetrics().density, Color.WHITE); // 2dp border
+//        border.setCornerRadius(8 * (int) getResources().getDisplayMetrics().density); // 8dp corners
+//        containerLayout.setBackground(border);
 
 // Add some padding to the container
         int padding = 12 * (int) getResources().getDisplayMetrics().density;

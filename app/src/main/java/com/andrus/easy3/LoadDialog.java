@@ -65,7 +65,7 @@ public class LoadDialog extends Dialog {
 
         // Delete button with confirmation
         Button deleteButton = findViewById(R.id.button_delete);
-        if (num<6) {
+        if (false) {    // former protection for preloaded presets
             deleteButton.setEnabled(false);
         }
         else {
@@ -76,42 +76,18 @@ public class LoadDialog extends Dialog {
                         .setPositiveButton("Yes", (dialog, which) -> {
 
                             // Perform delete action
+                            // Perform delete action
                             Toast.makeText(getContext(), "Item " + num + " Deleted", Toast.LENGTH_SHORT).show();
                             dismiss();
                             String filenameToDelete = "preset" + num + ".ini";
                             Log.i("EASY3", "Would delete " + filenameToDelete + " here.");
 
-                            ContentResolver resolver = getContext().getContentResolver();
-
-                            // Query for the file
-                            String[] projection = {MediaStore.MediaColumns._ID};
-                            String selection = MediaStore.MediaColumns.DISPLAY_NAME + "=? AND " +
-                                    MediaStore.MediaColumns.RELATIVE_PATH + "=?";
-                            String[] selectionArgs = {filenameToDelete, Environment.DIRECTORY_DOCUMENTS + "/Easy3/"};
-
-                            try (Cursor cursor = resolver.query(
-                                    MediaStore.Files.getContentUri("external"),
-                                    projection,
-                                    selection,
-                                    selectionArgs,
-                                    null)) {
-
-                                if (cursor != null && cursor.moveToFirst()) {
-                                    int idColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
-                                    long id = cursor.getLong(idColumn);
-                                    Uri fileUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), id);
-
-                                    int deleted = resolver.delete(fileUri, null, null);
-                                    boolean success = deleted > 0;
-
-                                    Log.i("EASY3", "File deleted: " + success);
-                                } else {
-                                    Log.i("EASY3", "File not found for deletion");
-                                }
-                            } catch (Exception e) {
-                                Log.e("EASY3", "Error deleting file", e);
-                            }
-
+                            // --- CHANGED: internal storage delete (was MediaStore query/cursor/URI delete) ---
+                            File dir = new File(getContext().getFilesDir(), "Easy3");
+                            File fileToDelete = new File(dir, filenameToDelete);
+                            boolean success = fileToDelete.delete();
+                            Log.i("EASY3", "File deleted: " + success);
+                            // --- END CHANGED ---
 
                             if (loadListener != null) {
                                 loadListener.onLoadClicked(num);
